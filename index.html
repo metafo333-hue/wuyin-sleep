@@ -2,262 +2,569 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>五音 · 国风助眠白噪音</title>
 <meta name="theme-color" content="#A8322D">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translacent">
 <meta name="apple-mobile-web-app-title" content="五音">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
-  :root{
-    --paper:#F4EFE4; --paper-2:#EBE3D2; --ink:#23211C; --ink-2:#5A5446;
-    --cinnabar:#A8322D; --gong:#C9A24B; --shang:#A9A293; --jue:#5E7E5B; --zhi:#B5443A; --yu:#3E5468;
-    --line:rgba(35,33,28,.12); --card:#FBF8F0; --shadow:0 8px 30px rgba(35,33,28,.10);
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;padding:0}
-  body{font-family:"Noto Serif SC","Songti SC",STSong,serif;background:var(--paper);color:var(--ink);
-    line-height:1.7;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;
-    background-image:radial-gradient(circle at 20% 8%,rgba(168,50,45,.04),transparent 40%),radial-gradient(circle at 85% 82%,rgba(62,84,104,.05),transparent 45%);}
-  .wrap{max-width:560px;margin:0 auto;padding:0 20px calc(env(safe-area-inset-bottom) + 28px)}
-  header{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 18px) 0 8px}
-  .brand{display:flex;align-items:center;gap:10px}
-  .seal{width:42px;height:42px;border-radius:8px;background:var(--cinnabar);color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700;box-shadow:var(--shadow);font-family:"Songti SC",serif}
-  .brand h1{font-size:19px;margin:0;letter-spacing:2px;font-weight:700}
-  .brand small{display:block;font-size:11px;color:var(--ink-2);letter-spacing:3px}
-  #installBtn{display:none;font-size:12px;padding:7px 13px;border:1px solid var(--cinnabar);color:var(--cinnabar);background:var(--card);border-radius:999px;font-family:inherit;cursor:pointer}
-  .tag{font-size:12px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;color:var(--ink-2);background:var(--card)}
-  .hero{text-align:center;padding:24px 0 12px}
-  .hero .big{font-size:clamp(27px,8.5vw,38px);font-weight:700;letter-spacing:3px;margin:0 0 8px}
-  .hero .big em{font-style:normal;color:var(--cinnabar)}
-  .hero p{font-size:13.5px;color:var(--ink-2);margin:0 auto;max-width:34ch}
-  .player{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin:20px 0;box-shadow:var(--shadow)}
-  .now{display:flex;align-items:center;gap:16px}
-  .disc{width:84px;height:84px;border-radius:50%;flex:0 0 auto;position:relative;background:conic-gradient(var(--gong),#8a6d2f,var(--gong));box-shadow:inset 0 0 0 6px rgba(255,255,255,.25),var(--shadow);display:grid;place-items:center}
-  .disc::after{content:"";width:22px;height:22px;border-radius:50%;background:var(--card);border:1px solid var(--line)}
-  .disc.spin{animation:spin 8s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .meta h2{margin:0;font-size:18px;letter-spacing:1px}
-  .meta .sub{font-size:12.5px;color:var(--ink-2);margin-top:3px}
-  .meta .five{display:inline-block;margin-top:6px;font-size:11px;color:#fff;background:var(--gong);padding:2px 9px;border-radius:6px;letter-spacing:1px}
-  .controls{display:flex;align-items:center;gap:14px;margin-top:20px}
-  .play{width:60px;height:60px;border-radius:50%;border:none;flex:0 0 auto;cursor:pointer;background:var(--cinnabar);color:#fff;font-size:24px;display:grid;place-items:center;box-shadow:0 6px 18px rgba(168,50,45,.35);transition:transform .12s}
-  .play:active{transform:scale(.93)}
-  .vol{flex:1;display:flex;align-items:center;gap:9px}.vol span{font-size:15px;color:var(--ink-2)}
-  .vol input{flex:1;accent-color:var(--cinnabar);height:5px}
-  .mixer{margin-top:18px;border-top:1px dashed var(--line);padding-top:14px}
-  .mixer .lbl{font-size:12px;color:var(--ink-2);letter-spacing:2px;margin-bottom:10px}
-  .mrow{display:flex;align-items:center;gap:12px;margin:9px 0}
-  .mrow .ico{width:26px;text-align:center;font-size:15px}.mrow .nm{flex:0 0 58px;font-size:12.5px}
-  .mrow input{flex:1;accent-color:var(--jue);height:4px}
-  .timer{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
-  .timer .lbl{font-size:12px;color:var(--ink-2);letter-spacing:2px;margin-bottom:10px;display:flex;justify-content:space-between}
-  .timer .lbl b{color:var(--cinnabar);font-weight:700;letter-spacing:0}
-  .chips{display:flex;gap:8px}
-  .chip{flex:1;text-align:center;font-size:13px;padding:9px 0;border:1px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;min-height:40px;transition:.15s}
-  .chip.on{background:var(--cinnabar);color:#fff;border-color:var(--cinnabar)}
-  section h3{font-size:15px;letter-spacing:3px;margin:26px 0 4px;display:flex;align-items:center;gap:8px}
-  section h3::before{content:"";width:14px;height:2px;background:var(--cinnabar)}
-  .sec-note{font-size:12px;color:var(--ink-2);margin:0 0 14px}
-  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-  .wuyin{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:13px 6px;text-align:center;cursor:pointer;transition:transform .12s;min-height:80px}
-  .wuyin:active{transform:scale(.95)}
-  .wuyin .yin{font-size:22px;font-weight:700;line-height:1.1}.wuyin .note{font-size:10px;color:var(--ink-2);letter-spacing:1px}
-  .wuyin .wx{font-size:11px;color:var(--ink-2);margin-top:2px}.wuyin .zang{font-size:10px;color:var(--ink-2);opacity:.8}
-  .wuyin[data-k=gong]{border-top:3px solid var(--gong)} .wuyin[data-k=gong] .yin{color:var(--gong)}
-  .wuyin[data-k=shang]{border-top:3px solid var(--shang)} .wuyin[data-k=shang] .yin{color:#7d776a}
-  .wuyin[data-k=jue]{border-top:3px solid var(--jue)} .wuyin[data-k=jue] .yin{color:var(--jue)}
-  .wuyin[data-k=zhi]{border-top:3px solid var(--zhi)} .wuyin[data-k=zhi] .yin{color:var(--zhi)}
-  .wuyin[data-k=yu]{border-top:3px solid var(--yu)} .wuyin[data-k=yu] .yin{color:var(--yu)}
-  .wuyin.on{box-shadow:0 0 0 2px var(--cinnabar)}
-  footer{text-align:center;font-size:11px;color:var(--ink-2);padding:24px 0 10px;line-height:2}
-  footer .dim{opacity:.7}
-  .hint{font-size:11px;color:var(--ink-2);text-align:center;margin-top:14px;opacity:.85}
+:root{
+  --paper:#F4EFE4;--paper-2:#EBE3D2;--ink:#23211C;--ink-2:#5A5446;
+  --cinnabar:#A8322D;--gong:#C9A24B;--shang:#9A9487;--jue:#5E7E5B;--zhi:#B5443A;--yu:#3E5468;
+  --line:rgba(35,33,28,.12);--card:#FBF8F0;--shadow:0 8px 30px rgba(35,33,28,.10);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:"Noto Serif SC","Songti SC",STSong,serif;background:var(--paper);color:var(--ink);
+  line-height:1.7;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(circle at 18% 7%,rgba(168,50,45,.04),transparent 40%),
+    radial-gradient(circle at 85% 82%,rgba(62,84,104,.05),transparent 45%);}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px calc(env(safe-area-inset-bottom)+28px)}
+header{display:flex;align-items:center;justify-content:space-between;
+  padding:calc(env(safe-area-inset-top)+16px) 0 6px}
+.brand{display:flex;align-items:center;gap:10px}
+.seal{width:40px;height:40px;border-radius:8px;background:var(--cinnabar);color:#fff;
+  display:grid;place-items:center;font-size:21px;font-weight:700;box-shadow:var(--shadow);
+  font-family:"Songti SC",serif}
+.brand h1{font-size:18px;margin:0;letter-spacing:2px;font-weight:700}
+.brand small{display:block;font-size:10.5px;color:var(--ink-2);letter-spacing:3px}
+#installBtn{display:none;font-size:11.5px;padding:6px 12px;border:1px solid var(--cinnabar);
+  color:var(--cinnabar);background:var(--card);border-radius:999px;font-family:inherit;cursor:pointer}
+
+.hero{text-align:center;padding:18px 0 6px}
+.hero .big{font-size:clamp(23px,7vw,33px);font-weight:700;letter-spacing:3px;margin:0 0 5px}
+.hero .big em{font-style:normal;color:var(--cinnabar)}
+.hero p{font-size:12.5px;color:var(--ink-2);margin:0 auto;max-width:36ch}
+
+/* 播放器主卡片 */
+.player{background:var(--card);border:1px solid var(--line);border-radius:20px;
+  padding:18px;margin:14px 0;box-shadow:var(--shadow)}
+
+/* 状态显示 */
+.now{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+.disc{width:72px;height:72px;border-radius:50%;flex:0 0 auto;position:relative;
+  background:conic-gradient(var(--gong),#8a6d2f,var(--gong));
+  box-shadow:inset 0 0 0 5px rgba(255,255,255,.22),var(--shadow);display:grid;place-items:center}
+.disc::after{content:"";width:19px;height:19px;border-radius:50%;
+  background:var(--card);border:1px solid var(--line)}
+.disc.spin{animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.meta h2{margin:0;font-size:15.5px;letter-spacing:1px}
+.meta .sub{font-size:11.5px;color:var(--ink-2);margin-top:2px;display:flex;align-items:center;gap:4px}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--cinnabar);
+  display:none;animation:bk .8s ease-in-out infinite}
+@keyframes bk{0%,100%{opacity:.2}50%{opacity:1}}
+.badge{display:inline-block;margin-top:5px;font-size:10.5px;color:#fff;
+  background:var(--gong);padding:2px 8px;border-radius:6px;letter-spacing:1px;transition:background .3s}
+
+/* 播放+总音量 */
+.ctrl{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.play{width:54px;height:54px;border-radius:50%;border:none;flex:0 0 auto;cursor:pointer;
+  background:var(--cinnabar);color:#fff;font-size:21px;display:grid;place-items:center;
+  box-shadow:0 5px 16px rgba(168,50,45,.35);transition:transform .12s;font-size:20px}
+.play:active{transform:scale(.93)}
+.vrow{flex:1;display:flex;align-items:center;gap:7px}
+.vrow span{font-size:14px;color:var(--ink-2)}
+.vrow input{flex:1;accent-color:var(--cinnabar);height:5px;cursor:pointer}
+
+/* 三层混音 */
+.layer{border-top:1px dashed var(--line);padding:11px 0 5px}
+.lhd{display:flex;align-items:center;gap:7px;margin-bottom:9px}
+.lico{font-size:15px;width:20px;text-align:center}
+.llbl{font-size:11.5px;color:var(--ink-2);letter-spacing:2px;flex:1}
+.lvol{display:flex;align-items:center;gap:5px;flex:1.3}
+.lvol input{flex:1;accent-color:var(--cinnabar);height:4px;cursor:pointer}
+.srow{display:flex;flex-wrap:wrap;gap:7px}
+.sbtn{font-size:12px;padding:6px 11px;border:1px solid var(--line);
+  border-radius:999px;background:var(--card);cursor:pointer;color:var(--ink-2);
+  font-family:inherit;transition:.15s;white-space:nowrap}
+.sbtn:active{transform:scale(.94)}
+.sbtn.on{color:#fff;border-color:var(--cinnabar);background:var(--cinnabar)}
+.sbtn.on[data-tone=gong]{background:var(--gong);border-color:var(--gong)}
+.sbtn.on[data-tone=shang]{background:var(--shang);border-color:var(--shang)}
+.sbtn.on[data-tone=jue]{background:var(--jue);border-color:var(--jue)}
+.sbtn.on[data-tone=zhi]{background:var(--zhi);border-color:var(--zhi)}
+.sbtn.on[data-tone=yu]{background:var(--yu);border-color:var(--yu)}
+
+/* 场景预设 */
+.presets{border-top:1px dashed var(--line);padding:11px 0 5px}
+.plbl{font-size:11.5px;color:var(--ink-2);letter-spacing:2px;margin-bottom:9px}
+.prow{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.pset{padding:9px 4px;text-align:center;border:1px solid var(--line);border-radius:12px;
+  background:var(--card);cursor:pointer;font-size:10.5px;line-height:1.5;
+  transition:.15s;font-family:inherit;color:var(--ink-2)}
+.pset .pe{font-size:16px;display:block;margin-bottom:2px}
+.pset:active{transform:scale(.95)}
+.pset.on{border-color:var(--cinnabar);box-shadow:0 0 0 1px var(--cinnabar)}
+
+/* 定时 */
+.timer{border-top:1px dashed var(--line);padding:11px 0 0}
+.thd{display:flex;justify-content:space-between;font-size:11.5px;
+  color:var(--ink-2);letter-spacing:2px;margin-bottom:9px}
+.thd b{color:var(--cinnabar);font-weight:700;letter-spacing:0}
+.chips{display:flex;gap:6px}
+.chip{flex:1;text-align:center;font-size:12px;padding:8px 0;border:1px solid var(--line);
+  border-radius:10px;background:var(--card);cursor:pointer;transition:.15s;font-family:inherit;
+  color:var(--ink-2)}
+.chip.on{background:var(--cinnabar);color:#fff;border-color:var(--cinnabar)}
+
+/* 五音说明 */
+.wyhead{font-size:14px;letter-spacing:3px;margin:22px 0 3px;
+  display:flex;align-items:center;gap:8px;font-weight:700}
+.wyhead::before{content:"";width:12px;height:2px;background:var(--cinnabar)}
+.wynote{font-size:12px;color:var(--ink-2);margin:0 0 12px}
+.wygrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.wycard{border:1px solid var(--line);border-radius:12px;background:var(--card);
+  padding:11px 4px;text-align:center}
+.wycard .yi{font-size:20px;font-weight:700;line-height:1.1}
+.wycard .nt{font-size:9.5px;color:var(--ink-2);letter-spacing:.5px}
+.wycard .wx{font-size:10px;color:var(--ink-2);margin-top:2px}
+.wycard[data-k=gong] .yi{color:var(--gong)}
+.wycard[data-k=shang] .yi{color:#7d776a}
+.wycard[data-k=jue] .yi{color:var(--jue)}
+.wycard[data-k=zhi] .yi{color:var(--zhi)}
+.wycard[data-k=yu] .yi{color:var(--yu)}
+
+footer{text-align:center;font-size:10.5px;color:var(--ink-2);
+  padding:18px 0 6px;line-height:2;border-top:1px solid var(--line);margin-top:4px}
+footer a{color:var(--ink-2)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div class="brand"><div class="seal">音</div><div><h1>五音</h1><small>宫 · 商 · 角 · 徵 · 羽</small></div></div>
+    <div class="brand">
+      <div class="seal">音</div>
+      <div><h1>五音</h1><small>宫 · 商 · 角 · 徵 · 羽</small></div>
+    </div>
     <button id="installBtn">＋ 装到桌面</button>
-    <div class="tag">国风助眠</div>
   </header>
+
   <div class="hero">
-    <p class="big">五音入<em>五脏</em>，一声安神</p>
-    <p>标准五声音阶拨弦 × 柔和自然底噪，择一调入眠。</p>
+    <p class="big">五音入<em>五脏</em>，择声安神</p>
+    <p>真实国风采样 × 自然底声，三层自由混音入眠。</p>
   </div>
+
   <div class="player">
+    <!-- 状态显示 -->
     <div class="now">
       <div class="disc" id="disc"></div>
-      <div class="meta"><h2 id="trackName">宫调 · 土 · 脾</h2><div class="sub" id="trackSub">主音 宫(C) · 古琴式拨弦 + 柔雨底</div><span class="five" id="trackFive">宫 · 土 · 脾</span></div>
+      <div class="meta">
+        <h2 id="trackName">宫 · 古琴·秋风辞</h2>
+        <div class="sub">
+          <span id="trackSub">点击播放，择声入眠</span>
+          <span class="ldot" id="ldot"></span>
+        </div>
+        <span class="badge" id="badge">宫 · 土 · 脾</span>
+      </div>
     </div>
-    <div class="controls">
+
+    <!-- 播放 + 总音量 -->
+    <div class="ctrl">
       <button class="play" id="playBtn" aria-label="播放">▶</button>
-      <div class="vol"><span>🔈</span><input type="range" id="vol" min="0" max="100" value="72" aria-label="总音量"></div>
+      <div class="vrow"><span>🔈</span><input type="range" id="vol" min="0" max="100" value="72"></div>
     </div>
-    <div class="mixer">
-      <div class="lbl">实时混音</div>
-      <div class="mrow"><span class="ico">🎴</span><span class="nm">五音拨弦</span><input type="range" id="mxPad" min="0" max="100" value="80"></div>
-      <div class="mrow"><span class="ico">🌧️</span><span class="nm">自然底</span><input type="range" id="mxBed" min="0" max="100" value="28"></div>
-      <div class="mrow"><span class="ico">🍃</span><span class="nm">疏密</span><input type="range" id="mxDen" min="0" max="100" value="50"></div>
+
+    <!-- 乐器层 -->
+    <div class="layer">
+      <div class="lhd">
+        <span class="lico">🎼</span>
+        <span class="llbl">乐器层</span>
+        <div class="lvol"><input type="range" id="volInstr" min="0" max="100" value="70"></div>
+      </div>
+      <div class="srow" id="instrRow">
+        <button class="sbtn on" data-instr="guqin-a" data-tone="gong">古琴·宫</button>
+        <button class="sbtn" data-instr="dizi-a"  data-tone="shang">笛·商</button>
+        <button class="sbtn" data-instr="guqin-b" data-tone="jue">古琴·角</button>
+        <button class="sbtn" data-instr="erhu-a"  data-tone="zhi">二胡·徵</button>
+        <button class="sbtn" data-instr="ks-yu"   data-tone="yu">拨弦·羽</button>
+      </div>
     </div>
+
+    <!-- 自然层 -->
+    <div class="layer">
+      <div class="lhd">
+        <span class="lico">🌧</span>
+        <span class="llbl">自然层</span>
+        <div class="lvol"><input type="range" id="volNature" min="0" max="100" value="48"></div>
+      </div>
+      <div class="srow" id="natureRow">
+        <button class="sbtn on" data-nature="rain-birds">雨·鸟鸣</button>
+        <button class="sbtn" data-nature="rain">细雨</button>
+        <button class="sbtn" data-nature="stream">溪流</button>
+        <button class="sbtn" data-nature="birds">鸟啼</button>
+        <button class="sbtn" data-nature="none">静音</button>
+      </div>
+    </div>
+
+    <!-- 底噪层 -->
+    <div class="layer">
+      <div class="lhd">
+        <span class="lico">〰</span>
+        <span class="llbl">底噪层（棕噪）</span>
+        <div class="lvol"><input type="range" id="volNoise" min="0" max="100" value="22"></div>
+      </div>
+    </div>
+
+    <!-- 场景预设 -->
+    <div class="presets">
+      <div class="plbl">场景预设</div>
+      <div class="prow">
+        <button class="pset" data-scene="mountain"><span class="pe">🏔</span>山林晨雨</button>
+        <button class="pset" data-scene="bamboo"><span class="pe">🎋</span>竹林听风</button>
+        <button class="pset" data-scene="night"><span class="pe">🌙</span>深夜细雨</button>
+        <button class="pset" data-scene="ripple"><span class="pe">🌊</span>溪边听鸟</button>
+      </div>
+    </div>
+
+    <!-- 睡眠定时 -->
     <div class="timer">
-      <div class="lbl"><span>睡眠定时</span><b id="timerState">关</b></div>
-      <div class="chips" id="chips">
-        <div class="chip on" data-min="0">关</div><div class="chip" data-min="15">15分</div><div class="chip" data-min="30">30分</div><div class="chip" data-min="60">60分</div><div class="chip" data-min="90">90分</div>
+      <div class="thd"><span>睡眠定时</span><b id="timerState">关</b></div>
+      <div class="chips">
+        <button class="chip on" data-min="0">关</button>
+        <button class="chip" data-min="15">15分</button>
+        <button class="chip" data-min="30">30分</button>
+        <button class="chip" data-min="60">60分</button>
+        <button class="chip" data-min="90">90分</button>
       </div>
     </div>
   </div>
-  <section>
-    <h3>五音调式</h3>
-    <p class="sec-note">标准五声音阶（十二平均律）· 点选切换主音调式。</p>
-    <div class="grid" id="wuyinGrid">
-      <div class="wuyin on" data-k="gong"><div class="yin">宫</div><div class="note">C</div><div class="wx">土</div><div class="zang">脾</div></div>
-      <div class="wuyin" data-k="shang"><div class="yin">商</div><div class="note">D</div><div class="wx">金</div><div class="zang">肺</div></div>
-      <div class="wuyin" data-k="jue"><div class="yin">角</div><div class="note">E</div><div class="wx">木</div><div class="zang">肝</div></div>
-      <div class="wuyin" data-k="zhi"><div class="yin">徵</div><div class="note">G</div><div class="wx">火</div><div class="zang">心</div></div>
-      <div class="wuyin" data-k="yu"><div class="yin">羽</div><div class="note">A</div><div class="wx">水</div><div class="zang">肾</div></div>
-    </div>
-    <div class="hint">标准五声音阶 · Karplus-Strong 拨弦合成 · 零版权 · 可离线</div>
-  </section>
-  <footer><div>五音 · 国风助眠白噪音</div><div class="dim">添加到主屏，睡前一键打开 · v1.1</div></footer>
+
+  <!-- 五音说明 -->
+  <div class="wyhead">五音·五脏</div>
+  <p class="wynote">中医五音对应五脏，宫养脾·商养肺·角养肝·徵养心·羽养肾。择调而眠，内外相应。</p>
+  <div class="wygrid">
+    <div class="wycard" data-k="gong"><div class="yi">宫</div><div class="nt">C · 土</div><div class="wx">脾</div></div>
+    <div class="wycard" data-k="shang"><div class="yi">商</div><div class="nt">D · 金</div><div class="wx">肺</div></div>
+    <div class="wycard" data-k="jue"><div class="yi">角</div><div class="nt">E · 木</div><div class="wx">肝</div></div>
+    <div class="wycard" data-k="zhi"><div class="yi">徵</div><div class="nt">G · 火</div><div class="wx">心</div></div>
+    <div class="wycard" data-k="yu"><div class="yi">羽</div><div class="nt">A · 水</div><div class="wx">肾</div></div>
+  </div>
+
+  <footer>
+    <div>古琴·秋风辞 · Public Domain · 笛子样本 · <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a> · Wikimedia Commons</div>
+    <div>古琴·醉渔唱晚 · <a href="https://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a> · Charles R Tsua via Wikimedia</div>
+    <div>二胡·二泉映月 · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> · 张沛坚 via Wikimedia</div>
+    <div>自然声采样 · <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0</a> · archive.org · 五音 v2.0</div>
+  </footer>
 </div>
+
 <script>
-function getC(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
-// 标准五声音阶（十二平均律，C 为宫）· 低八度更安神 + 中八度点缀
-const PENTA = [130.81,146.83,164.81,196.00,220.00, 261.63,293.66,329.63]; // 宫商角徵羽(C3..A3)+宫商角(C4..E4)
-const TONES = {
-  gong: {z:'宫', name:'宫调 · 土 · 脾', five:'宫 · 土 · 脾', sub:'主音 宫(C) · 古琴式拨弦 + 柔雨底', accent:getC('--gong'), tonic:130.81, bedF:900,  lfo:0.06},
-  shang:{z:'商', name:'商调 · 金 · 肺', five:'商 · 金 · 肺', sub:'主音 商(D) · 拨弦 + 清风底',     accent:'#7d776a',     tonic:146.83, bedF:1200, lfo:0.09},
-  jue:  {z:'角', name:'角调 · 木 · 肝', five:'角 · 木 · 肝', sub:'主音 角(E) · 拨弦 + 林泉底',     accent:getC('--jue'), tonic:164.81, bedF:1500, lfo:0.18},
-  zhi:  {z:'徵', name:'徵调 · 火 · 心', five:'徵 · 火 · 心', sub:'主音 徵(G) · 拨弦 + 暖底',       accent:getC('--zhi'), tonic:196.00, bedF:520,  lfo:0.13},
-  yu:   {z:'羽', name:'羽调 · 水 · 肾', five:'羽 · 水 · 肾', sub:'主音 羽(A) · 拨弦 + 浪涌底',     accent:getC('--yu'),  tonic:220.00, bedF:380,  lfo:0.05},
+// ===== 音频资产配置 =====
+const AUDIO_BASE='https://github.com/metafo333-hue/wuyin-sleep/releases/download/v2.0-audio/';
+
+const INSTRUMENTS={
+  'guqin-a':{label:'宫 · 古琴·秋风辞', file:'guqin-a.mp3', tone:'gong',  acc:'var(--gong)', badge:'宫 · 土 · 脾', sub:'古琴·秋风辞 · 真实录音'},
+  'dizi-a':  {label:'商 · 笛·竹笛',     file:'dizi-a.mp3',  tone:'shang', acc:'var(--shang)',badge:'商 · 金 · 肺', sub:'竹笛样本 · CC0录音'},
+  'guqin-b': {label:'角 · 古琴·醉渔唱晚',file:'guqin-b.mp3',tone:'jue',   acc:'var(--jue)', badge:'角 · 木 · 肝', sub:'古琴·醉渔唱晚 · 真实录音'},
+  'erhu-a':  {label:'徵 · 二胡·二泉映月',file:'erhu-a.mp3', tone:'zhi',   acc:'var(--zhi)', badge:'徵 · 火 · 心', sub:'二胡·二泉映月 · 真实录音'},
+  'ks-yu':   {label:'羽 · 拨弦·合成',    file:null,          tone:'yu',    acc:'var(--yu)',  badge:'羽 · 水 · 肾', sub:'五音合成拨弦'},
 };
-const $=id=>document.getElementById(id);
-let ctx=null, g=null, cur='gong', playing=false, userVol=0.72, pluckTimer=null;
+
+const NATURES={
+  'rain-birds':{file:'rain-birds.mp3'},
+  'rain':       {file:'rain.mp3'},
+  'stream':     {file:'stream.mp3'},
+  'birds':      {file:'birds.mp3'},
+  'none':       {file:null},
+};
+
+const SCENES={
+  mountain:{instr:'guqin-a', nature:'rain-birds', vi:68, vn:58, vb:22},
+  bamboo:  {instr:'dizi-a',  nature:'stream',     vi:64, vn:52, vb:28},
+  night:   {instr:'erhu-a',  nature:'rain',       vi:60, vn:68, vb:14},
+  ripple:  {instr:'ks-yu',   nature:'birds',      vi:76, vn:42, vb:10},
+};
+
+// ===== KS合成（羽·fallback）=====
+const PENTA=[130.81,146.83,164.81,196.00,220.00,261.63,293.66,329.63];
+const TONICS={gong:130.81,shang:146.83,jue:164.81,zhi:196.00,yu:220.00};
 const ksCache=new Map();
 
-// ===== Karplus-Strong 拨弦合成（古琴/古筝式音色）=====
+function snap(f){let b=f,d=1e9;[...PENTA,...PENTA.map(x=>x*2)].forEach(p=>{const dd=Math.abs(p-f);if(dd<d){d=dd;b=p;}});return b;}
+
 function ksBuffer(freq){
-  if(ksCache.has(freq)) return ksCache.get(freq);
-  const sr=ctx.sampleRate, N=Math.max(2,Math.round(sr/freq));
-  const dur=Math.min(6, 2.4 + 160/freq), len=Math.round(sr*dur);
-  const buf=ctx.createBuffer(1,len,sr), out=buf.getChannelData(0);
+  if(ksCache.has(freq))return ksCache.get(freq);
+  const sr=ctx.sampleRate,N=Math.max(2,Math.round(sr/freq));
+  const dur=Math.min(6,2.4+160/freq),len=Math.round(sr*dur);
+  const buf=ctx.createBuffer(1,len,sr),out=buf.getChannelData(0);
   const line=new Float32Array(N);
-  for(let i=0;i<N;i++) line[i]=Math.random()*2-1;
-  for(let i=1;i<N;i++) line[i]=0.5*(line[i]+line[i-1]); // 柔化激励（少高频刺耳）
-  let idx=0; const damp=0.9965;
-  for(let i=0;i<len;i++){
-    const cur=line[idx], nxt=line[(idx+1)%N], v=0.5*(cur+nxt)*damp;
-    out[i]=cur; line[idx]=v; idx=(idx+1)%N;
-  }
-  const a=Math.round(sr*0.005); for(let i=0;i<a;i++) out[i]*=i/a;       // 软起音
-  const tl=Math.round(len*0.18); for(let i=0;i<tl;i++) out[len-1-i]*=1-i/tl; // 尾部渐隐
-  ksCache.set(freq,buf); return buf;
+  for(let i=0;i<N;i++)line[i]=Math.random()*2-1;
+  for(let i=1;i<N;i++)line[i]=0.5*(line[i]+line[i-1]);
+  let idx=0;const damp=0.9965;
+  for(let i=0;i<len;i++){const c=line[idx],nx=line[(idx+1)%N],v=0.5*(c+nx)*damp;out[i]=c;line[idx]=v;idx=(idx+1)%N;}
+  const a=Math.round(sr*0.005);for(let i=0;i<a;i++)out[i]*=i/a;
+  const tl=Math.round(len*0.18);for(let i=0;i<tl;i++)out[len-1-i]*=1-i/tl;
+  ksCache.set(freq,buf);return buf;
 }
-function makeImpulse(dur,decay){
-  const sr=ctx.sampleRate, len=Math.round(sr*dur), imp=ctx.createBuffer(2,len,sr);
-  for(let ch=0;ch<2;ch++){const d=imp.getChannelData(ch);
-    for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);}
-  return imp;
+
+function makeImpulse(dur,dec){
+  const sr=ctx.sampleRate,len=Math.round(sr*dur),im=ctx.createBuffer(2,len,sr);
+  for(let c=0;c<2;c++){const d=im.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,dec);}
+  return im;
 }
+
 function makeBrown(){
-  const sr=ctx.sampleRate, len=sr*4, buf=ctx.createBuffer(1,len,sr), d=buf.getChannelData(0);
-  let last=0; for(let i=0;i<len;i++){const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*3.2;}
-  const f=Math.round(sr*0.05); for(let i=0;i<f;i++){const k=i/f; d[i]*=k; d[len-1-i]*=k;}
+  const sr=ctx.sampleRate,len=sr*4,buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+  let last=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.2;}
+  const f=Math.round(sr*0.05);for(let i=0;i<f;i++){const k=i/f;d[i]*=k;d[len-1-i]*=k;}
   return buf;
 }
-function build(){
-  ctx=new (window.AudioContext||window.webkitAudioContext)();
-  const t=TONES[cur];
-  const master=ctx.createGain(); master.gain.value=userVol;
-  const warm=ctx.createBiquadFilter(); warm.type='lowpass'; warm.frequency.value=3600; // 去顶部毛刺
-  master.connect(warm); warm.connect(ctx.destination);
-  // 混响
-  const reverb=ctx.createConvolver(); reverb.buffer=makeImpulse(3.2,2.4);
-  const wet=ctx.createGain(); wet.gain.value=0.32; reverb.connect(wet); wet.connect(master);
-  // 拨弦总线（dry + 送混响）
-  const padBus=ctx.createGain(); padBus.gain.value=$('mxPad').value/100; padBus.connect(master); padBus.connect(reverb);
-  // 自然底噪（柔，低）
-  const noise=ctx.createBufferSource(); noise.buffer=makeBrown(); noise.loop=true;
-  const bedF=ctx.createBiquadFilter(); bedF.type='lowpass'; bedF.frequency.value=t.bedF; bedF.Q.value=0.5;
-  const modG=ctx.createGain(); modG.gain.value=0.7;
-  const lfo=ctx.createOscillator(); lfo.frequency.value=t.lfo;
-  const lfoD=ctx.createGain(); lfoD.gain.value=0.5;
-  const bedG=ctx.createGain(); bedG.gain.value=0.35*($('mxBed').value/100);
-  noise.connect(bedF); bedF.connect(modG); modG.connect(bedG); bedG.connect(master);
-  lfo.connect(lfoD); lfoD.connect(modG.gain);
-  noise.start(); lfo.start();
-  g={master,reverb,padBus,bedF,bedG,modG,lfo,warm};
-  scheduleNext();
-}
-function pickNote(){
-  const t=TONES[cur], r=Math.random();
-  // 主音权重高 + 同调五声音阶其余音 + 偶尔上八度
-  const scale=[t.tonic, t.tonic*9/8, t.tonic*81/64, t.tonic*3/2, t.tonic*27/16].map(snap);
-  if(r<0.34) return scale[0];
-  if(r<0.55) return scale[3];           // 五度
-  if(r<0.72) return scale[1];
-  if(r<0.85) return scale[4];
-  if(r<0.93) return scale[2];
-  return scale[0]*2;                    // 上八度点缀
-}
-function snap(f){ // 吸附到最近的标准五声音阶频率，保证"有标准"
-  let best=f,dmin=1e9; const pool=PENTA.concat(PENTA.map(x=>x*2));
-  pool.forEach(p=>{const d=Math.abs(p-f); if(d<dmin){dmin=d;best=p;}}); return best;
-}
-function pluck(freq,vel){
-  const src=ctx.createBufferSource(); src.buffer=ksBuffer(freq);
-  const ng=ctx.createGain(); ng.gain.value=vel; src.connect(ng); ng.connect(g.padBus); src.start();
-}
-function scheduleNext(){
-  if(!playing||!ctx) return;
-  pluck(pickNote(), 0.5+Math.random()*0.35);
-  const dens=$('mxDen').value/100;               // 疏密：0=很慢 1=较密
-  const gap=(3.6-2.4*dens)*(0.7+Math.random()*0.6); // 约 1.0~3.8s
-  pluckTimer=setTimeout(scheduleNext, gap*1000);
-}
-function setPlay(p){playing=p; $('playBtn').textContent=p?'❚❚':'▶'; $('disc').classList.toggle('spin',p);
-  if('mediaSession' in navigator) try{navigator.mediaSession.playbackState=p?'playing':'paused';}catch(e){}}
 
-$('playBtn').onclick=async()=>{
-  if(!ctx){ build(); setPlay(true); return; }
-  if(playing){ playing=false; if(pluckTimer)clearTimeout(pluckTimer); await ctx.suspend(); setPlay(false); }
-  else{ await ctx.resume(); setPlay(true); scheduleNext(); }
-};
-$('vol').addEventListener('input',e=>{userVol=e.target.value/100; if(g)g.master.gain.setTargetAtTime(userVol,ctx.currentTime,0.05);});
-$('mxPad').addEventListener('input',e=>{if(g)g.padBus.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,0.05);});
-$('mxBed').addEventListener('input',e=>{if(g)g.bedG.gain.setTargetAtTime(0.35*(e.target.value/100),ctx.currentTime,0.05);});
+// ===== 状态 =====
+let ctx=null,playing=false,loading=false;
+let masterGain,warm,reverb,revWet,instrGain,natureGain,noiseGain;
+let instrBufs={},instrSrc=null,ksTimer=null,ksActive=false,ksTone='yu';
+let natureEls={},activeNature='rain-birds',activeInstr='guqin-a';
+let sleepTimer=null;
 
-function selectTone(k){
-  cur=k; const t=TONES[k];
-  $('trackName').textContent=t.name; $('trackFive').textContent=t.five; $('trackSub').textContent=t.sub;
-  $('trackFive').style.background=t.accent;
-  $('disc').style.background=`conic-gradient(${t.accent},#7a6a52,${t.accent})`;
-  if(g){ g.bedF.frequency.setTargetAtTime(t.bedF,ctx.currentTime,0.4); g.lfo.frequency.setTargetAtTime(t.lfo,ctx.currentTime,0.3); }
-  if('mediaSession' in navigator) try{navigator.mediaSession.metadata=new MediaMetadata({title:t.name,artist:'五音 · 国风助眠',album:t.five});}catch(e){}
+const $=id=>document.getElementById(id);
+
+// ===== 音频图 =====
+function buildGraph(){
+  ctx=new(window.AudioContext||window.webkitAudioContext)();
+  masterGain=ctx.createGain();masterGain.gain.value=$('vol').value/100;
+  warm=ctx.createBiquadFilter();warm.type='lowpass';warm.frequency.value=3800;
+  masterGain.connect(warm);warm.connect(ctx.destination);
+  reverb=ctx.createConvolver();reverb.buffer=makeImpulse(3,2.2);
+  revWet=ctx.createGain();revWet.gain.value=0.24;
+  reverb.connect(revWet);revWet.connect(masterGain);
+  instrGain=ctx.createGain();instrGain.gain.value=$('volInstr').value/100;
+  instrGain.connect(masterGain);instrGain.connect(reverb);
+  natureGain=ctx.createGain();natureGain.gain.value=$('volNature').value/100;
+  natureGain.connect(masterGain);
+  noiseGain=ctx.createGain();noiseGain.gain.value=$('volNoise').value/100*0.32;
+  noiseGain.connect(masterGain);
+  const bs=ctx.createBufferSource();bs.buffer=makeBrown();bs.loop=true;
+  bs.connect(noiseGain);bs.start();
 }
-document.querySelectorAll('.wuyin').forEach(el=>{el.onclick=()=>{document.querySelectorAll('.wuyin').forEach(x=>x.classList.remove('on')); el.classList.add('on'); selectTone(el.dataset.k);};});
 
-let timer=null;
-document.querySelectorAll('.chip').forEach(c=>{c.onclick=()=>{
-  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on');
-  if(timer)clearTimeout(timer); const min=+c.dataset.min;
-  if(min===0){$('timerState').textContent='关'; return;}
-  $('timerState').textContent=min+' 分钟后停';
-  timer=setTimeout(()=>{
-    if(g&&ctx){ g.master.gain.setTargetAtTime(0,ctx.currentTime,6); setTimeout(async()=>{playing=false; if(pluckTimer)clearTimeout(pluckTimer); await ctx.suspend(); setPlay(false); g.master.gain.value=userVol;},22000);}
-    $('timerState').textContent='已停'; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); document.querySelector('.chip[data-min="0"]').classList.add('on');
-  }, min*60*1000);
-};});
-if('mediaSession' in navigator){navigator.mediaSession.setActionHandler('play',()=>$('playBtn').click());navigator.mediaSession.setActionHandler('pause',()=>$('playBtn').click());}
-document.addEventListener('visibilitychange',()=>{if(!document.hidden&&playing&&ctx&&ctx.state==='suspended')ctx.resume();});
-let deferred=null; const ib=$('installBtn');
+// ===== 乐器 =====
+async function loadInstrBuf(id){
+  if(instrBufs[id])return instrBufs[id];
+  const info=INSTRUMENTS[id];if(!info.file)return null;
+  setLoad(true);
+  try{
+    const r=await fetch(AUDIO_BASE+info.file,{mode:'cors'});
+    if(!r.ok)throw new Error(r.status);
+    instrBufs[id]=await ctx.decodeAudioData(await r.arrayBuffer());
+    return instrBufs[id];
+  }catch(e){console.warn('instr load fail',id,e);return null;}
+  finally{setLoad(false);}
+}
+
+function stopInstr(){
+  if(instrSrc){try{instrSrc.stop();}catch(e){}instrSrc=null;}
+  if(ksTimer){clearTimeout(ksTimer);ksTimer=null;}
+  ksActive=false;
+}
+
+function startInstrBuf(buf){
+  stopInstr();
+  instrSrc=ctx.createBufferSource();
+  instrSrc.buffer=buf;instrSrc.loop=true;
+  instrSrc.connect(instrGain);instrSrc.start();
+}
+
+function startKS(toneKey){
+  stopInstr();ksTone=toneKey;ksActive=true;schedKS();
+}
+
+function schedKS(){
+  if(!playing||!ksActive||!ctx)return;
+  const tn=TONICS[ksTone]||220;
+  const sc=[tn,tn*9/8,tn*81/64,tn*3/2,tn*27/16].map(snap);
+  const r=Math.random();
+  const f=r<.34?sc[0]:r<.55?sc[3]:r<.72?sc[1]:r<.85?sc[4]:r<.93?sc[2]:sc[0]*2;
+  const s2=ctx.createBufferSource();s2.buffer=ksBuffer(f);
+  const ng=ctx.createGain();ng.gain.value=0.45+Math.random()*.35;
+  s2.connect(ng);ng.connect(instrGain);s2.start();
+  const gap=(3.2-1.8*0.5)*(0.7+Math.random()*.6);
+  ksTimer=setTimeout(schedKS,gap*1000);
+}
+
+async function switchInstr(id){
+  stopInstr();activeInstr=id;
+  updateMeta(id);
+  if(!playing)return;
+  const info=INSTRUMENTS[id];
+  if(info.file){
+    const buf=await loadInstrBuf(id);
+    if(buf){startInstrBuf(buf);return;}
+  }
+  startKS(info.tone);
+}
+
+// ===== 自然声 =====
+function getNatureEl(id){
+  if(!id||id==='none')return null;
+  if(natureEls[id])return natureEls[id];
+  const info=NATURES[id];if(!info||!info.file)return null;
+  const el=document.createElement('audio');
+  el.crossOrigin='anonymous';el.loop=true;el.preload='none';
+  el.src=AUDIO_BASE+info.file;
+  document.body.appendChild(el);natureEls[id]=el;return el;
+}
+
+function connectNatureEl(el){
+  if(!el||el._wn)return;
+  const src=ctx.createMediaElementSource(el);
+  src.connect(natureGain);el._wn=true;
+}
+
+function switchNature(id){
+  Object.values(natureEls).forEach(el=>{if(!el.paused){el.pause();el.currentTime=0;}});
+  activeNature=id;
+  if(!playing||!id||id==='none')return;
+  const el=getNatureEl(id);if(!el)return;
+  connectNatureEl(el);el.play().catch(()=>{});
+}
+
+// ===== 全局播放 =====
+async function startAll(){
+  if(!ctx)buildGraph();
+  if(ctx.state==='suspended')await ctx.resume();
+  // 乐器
+  const info=INSTRUMENTS[activeInstr];
+  if(info.file){
+    const buf=await loadInstrBuf(activeInstr);
+    if(buf)startInstrBuf(buf);else startKS(info.tone);
+  }else startKS(info.tone);
+  // 自然声
+  if(activeNature!=='none'){
+    const el=getNatureEl(activeNature);
+    if(el){connectNatureEl(el);el.play().catch(()=>{});}
+  }
+  playing=true;updPlayUI();
+}
+
+async function stopAll(){
+  stopInstr();
+  Object.values(natureEls).forEach(el=>{if(!el.paused)el.pause();});
+  if(ctx)await ctx.suspend();
+  playing=false;updPlayUI();
+}
+
+// ===== UI =====
+function setLoad(v){loading=v;$('ldot').style.display=v?'inline-block':'none';}
+
+function updateMeta(id){
+  const info=INSTRUMENTS[id]||{};
+  $('trackName').textContent=info.label||id;
+  $('trackSub').textContent=info.sub||'';
+  const bg=$('badge');bg.textContent=info.badge||'';bg.style.background=info.acc||'var(--gong)';
+  $('disc').style.background=`conic-gradient(${info.acc||'var(--gong)'},#7a6a52,${info.acc||'var(--gong)'})`;
+  if('mediaSession'in navigator)try{navigator.mediaSession.metadata=new MediaMetadata({title:info.label||'五音',artist:'五音·国风助眠',album:info.badge||''});}catch(e){}
+}
+
+function updPlayUI(){
+  $('playBtn').textContent=playing?'❚❚':'▶';
+  $('disc').classList.toggle('spin',playing);
+  if('mediaSession'in navigator)try{navigator.mediaSession.playbackState=playing?'playing':'paused';}catch(e){}
+}
+
+// ===== 事件绑定 =====
+$('playBtn').onclick=async()=>{ if(!playing)await startAll(); else await stopAll(); };
+
+$('vol').addEventListener('input',e=>{
+  if(masterGain)masterGain.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,.05);
+});
+$('volInstr').addEventListener('input',e=>{
+  if(instrGain)instrGain.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,.05);
+});
+$('volNature').addEventListener('input',e=>{
+  if(natureGain)natureGain.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,.05);
+});
+$('volNoise').addEventListener('input',e=>{
+  if(noiseGain)noiseGain.gain.setTargetAtTime(e.target.value/100*0.32,ctx.currentTime,.05);
+});
+
+// 乐器选择
+document.querySelectorAll('[data-instr]').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('[data-instr]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    switchInstr(btn.dataset.instr);
+  };
+});
+
+// 自然声选择
+document.querySelectorAll('[data-nature]').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('[data-nature]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    switchNature(btn.dataset.nature);
+  };
+});
+
+// 场景预设
+document.querySelectorAll('[data-scene]').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('[data-scene]').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    const sc=SCENES[btn.dataset.scene];if(!sc)return;
+    $('volInstr').value=sc.vi;$('volNature').value=sc.vn;$('volNoise').value=sc.vb;
+    if(ctx){
+      if(instrGain)instrGain.gain.setTargetAtTime(sc.vi/100,ctx.currentTime,.4);
+      if(natureGain)natureGain.gain.setTargetAtTime(sc.vn/100,ctx.currentTime,.4);
+      if(noiseGain)noiseGain.gain.setTargetAtTime(sc.vb/100*0.32,ctx.currentTime,.4);
+    }
+    // 切乐器/自然声
+    const ib=document.querySelector(`[data-instr="${sc.instr}"]`);
+    if(ib&&ib.dataset.instr!==activeInstr)ib.click();
+    const nb=document.querySelector(`[data-nature="${sc.nature}"]`);
+    if(nb&&nb.dataset.nature!==activeNature)nb.click();
+  };
+});
+
+// 睡眠定时
+document.querySelectorAll('.chip').forEach(c=>{
+  c.onclick=()=>{
+    document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+    c.classList.add('on');
+    if(sleepTimer)clearTimeout(sleepTimer);
+    const min=+c.dataset.min;
+    if(min===0){$('timerState').textContent='关';return;}
+    $('timerState').textContent=min+'分钟后停';
+    sleepTimer=setTimeout(()=>{
+      if(masterGain&&ctx)masterGain.gain.setTargetAtTime(0,ctx.currentTime,8);
+      setTimeout(async()=>{
+        await stopAll();
+        if(masterGain&&ctx)masterGain.gain.value=$('vol').value/100;
+        $('timerState').textContent='已停';
+        document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+        document.querySelector('.chip[data-min="0"]').classList.add('on');
+      },25000);
+    },min*60*1000);
+  };
+});
+
+// MediaSession
+if('mediaSession'in navigator){
+  try{
+    navigator.mediaSession.setActionHandler('play',()=>{if(!playing)$('playBtn').click();});
+    navigator.mediaSession.setActionHandler('pause',()=>{if(playing)$('playBtn').click();});
+  }catch(e){}
+}
+
+// 页面可见性恢复
+document.addEventListener('visibilitychange',()=>{
+  if(!document.hidden&&playing&&ctx&&ctx.state==='suspended')ctx.resume();
+});
+
+// 初始化显示
+updateMeta(activeInstr);
+
+// PWA 安装
+let deferred=null;
+const ib=$('installBtn');
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;ib.style.display='block';});
 ib.onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;ib.style.display='none';};
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
 </html>
