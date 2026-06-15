@@ -115,6 +115,8 @@ html,body{height:100%;background:var(--paper);color:var(--ink);
 .sbtn.on{background:var(--red);color:#fff;border-color:var(--red)}
 .mix-density{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:var(--ink3)}
 .mix-density input{flex:1;accent-color:var(--red);height:3px;cursor:pointer}
+.nat-group{display:flex;flex-wrap:wrap;align-items:center;gap:5px;width:100%;margin-bottom:3px}
+.nat-lbl{font-size:9px;color:var(--ink3);width:38px;flex:0 0 38px;letter-spacing:.3px;opacity:.8}
 
 /* ===== Tab1 播放 ===== */
 .play-center{display:flex;flex-direction:column;align-items:center;padding:8px 0}
@@ -327,11 +329,32 @@ footer a{color:var(--ink3)}
       <div class="mix-vol"><span id="vnV">48</span>%<input type="range" id="vn" min="0" max="100" value="48"></div>
     </div>
     <div class="srow" id="natureRow">
-      <button class="sbtn on" data-nature="rain-birds">雨·鸟鸣</button>
-      <button class="sbtn" data-nature="rain">细雨</button>
-      <button class="sbtn" data-nature="stream">溪流</button>
-      <button class="sbtn" data-nature="birds">鸟啼</button>
-      <button class="sbtn" data-nature="none">静音</button>
+      <div class="nat-group"><span class="nat-lbl">木·春</span>
+        <button class="sbtn" data-nature="oriole">黄鹂</button>
+        <button class="sbtn" data-nature="cuckoo">杜鹃</button>
+        <button class="sbtn" data-nature="spring-wind">春风</button>
+      </div>
+      <div class="nat-group"><span class="nat-lbl">火·夏</span>
+        <button class="sbtn" data-nature="cicada">蝉鸣</button>
+        <button class="sbtn" data-nature="summer-rain">夏雨</button>
+      </div>
+      <div class="nat-group"><span class="nat-lbl">土·长夏</span>
+        <button class="sbtn on" data-nature="light-rain">细雨</button>
+        <button class="sbtn" data-nature="stream">山涧</button>
+      </div>
+      <div class="nat-group"><span class="nat-lbl">金·秋</span>
+        <button class="sbtn" data-nature="geese">鸿雁</button>
+        <button class="sbtn" data-nature="autumn-wind">秋风</button>
+        <button class="sbtn" data-nature="cricket">蟋蟀</button>
+      </div>
+      <div class="nat-group"><span class="nat-lbl">水·冬</span>
+        <button class="sbtn" data-nature="ocean">海浪</button>
+        <button class="sbtn" data-nature="cosmos">星空</button>
+      </div>
+      <div class="nat-group"><span class="nat-lbl">融合</span>
+        <button class="sbtn" data-nature="rain-birds">雨·晨鸟</button>
+        <button class="sbtn" data-nature="none">静音</button>
+      </div>
     </div>
   </div>
   <div class="mix-lyr">
@@ -466,10 +489,10 @@ const INSTRUMENTS={
   'ks-yu':   {label:'羽·拨弦',file:null,tone:'yu',   acc:'var(--blue)', badge:'羽·水·肾',sub:'五音合成 · 羽调 KS 拨弦'},
 };
 const SCENES={
-  mountain:{instr:'guqin-a',nature:'rain-birds',vi:68,vn:58,vb:20,noise:'brown'},
-  bamboo:  {instr:'dizi-a', nature:'stream',    vi:64,vn:52,vb:28,noise:'wind'},
-  night:   {instr:'erhu-a', nature:'rain',      vi:60,vn:65,vb:14,noise:'pink'},
-  ripple:  {instr:'ks-yu',  nature:'birds',     vi:76,vn:42,vb:10,noise:'brown'},
+  mountain:{instr:'guqin-a',nature:'rain-birds', vi:68,vn:58,vb:20,noise:'brown'},
+  bamboo:  {instr:'dizi-a', nature:'stream',     vi:64,vn:52,vb:28,noise:'wind'},
+  night:   {instr:'erhu-a', nature:'light-rain', vi:60,vn:65,vb:14,noise:'pink'},
+  ripple:  {instr:'ks-yu',  nature:'oriole',     vi:76,vn:42,vb:10,noise:'brown'},
 };
 // 五行完整对应
 const WUXING={
@@ -507,7 +530,7 @@ let masterGain,warmF,reverb,revWet,instrGain,natureGain,noiseGain,synthGain;
 let activeNoise='brown',noiseSrc=null,noiseLPF=null;
 let instrBufs={},instrSrc=null,instrSrcGain=null;
 let ksActive=false,ksTone='yu',ksTimer=null,ksDensity=3;
-let natureSynth=null,activeInstr='guqin-a',activeNature='rain-birds';
+let natureSynth=null,activeInstr='guqin-a',activeNature='light-rain';
 let synthOscs={};
 let sleepStart=0,sleepDur=0,timerEnd=0,timerAF=null;
 let statMin=+localStorage.getItem('wy_min')||0;
@@ -672,13 +695,28 @@ async function switchInstr(id,cf=true){
   instrSrc=null; startKS(info.tone);
 }
 
-// 自然声合成（纯 Web Audio · 零文件依赖）
-const NATURE_NAMES={'rain-birds':'雨·鸟鸣','rain':'细雨','stream':'溪流','birds':'鸟啼','none':'自然层静音'};
+// 自然声合成 v2.0 · 五行十三景 · 智能节奏耦合（纯 Web Audio · 零文件依赖）
+// 出处：《黄帝内经·素问·阴阳应象大论》五行应五音应自然 · 《礼记·月令》季令声物
+// 木·春·角·肝：东风/黄鹂/杜鹃  火·夏·徵·心：蝉/雷雨  土·长夏·宫·脾：细雨/山涧
+// 金·秋·商·肺：鸿雁/秋风/蟋蟀  水·冬·羽·肾：海浪/星空
+const NATURE_NAMES={
+  'oriole':'黄鹂·仓庚','cuckoo':'杜鹃·布谷','spring-wind':'春风·萌',
+  'cicada':'蝉鸣·知了','summer-rain':'夏雨·骤',
+  'light-rain':'细雨·润','stream':'山涧·潺',
+  'geese':'鸿雁·南飞','autumn-wind':'秋风·爽','cricket':'蟋蟀·秋夜',
+  'ocean':'海浪·涌','cosmos':'星空·玄',
+  'rain-birds':'雨·晨鸟','none':'自然层静音'
+};
 function makeNatureSynth(id){
   if(!ctx||!id||id==='none')return null;
   const stops=[];
-  function pinkBuf(){
-    const sr=ctx.sampleRate,len=sr*4,buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+  // speedFactor: 密度1→0.5 密度5→1.5，由 ksDensity 驱动，控制节奏快慢
+  let sf=0.5+(ksDensity-1)*0.25;
+  const lfoNodes=[]; // 收集所有 LFO 以便密度变化时实时更新
+
+  // ── 噪声缓冲 ──
+  function pinkBuf(dur=4){
+    const sr=ctx.sampleRate,len=sr*dur,buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
     let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
     for(let i=0;i<len;i++){const w=Math.random()*2-1;
       b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;
@@ -687,45 +725,325 @@ function makeNatureSynth(id){
       d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;b6=w*0.115926;}
     return buf;
   }
-  function addRain(cutoff){
-    const src=ctx.createBufferSource();src.buffer=pinkBuf();src.loop=true;
-    const lpf=ctx.createBiquadFilter();lpf.type='lowpass';lpf.frequency.value=cutoff;
-    src.connect(lpf);lpf.connect(natureGain);src.start();
-    stops.push(()=>{try{src.stop();}catch(e){}lpf.disconnect();});
+  function brownBuf(dur=5){
+    const sr=ctx.sampleRate,len=sr*dur,buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+    let last=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.5;}
+    return buf;
   }
-  function addBirds(freq,interval){
-    let alive=true;
-    function chirp(){
-      if(!alive||!ctx)return;
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.frequency.value=freq+Math.random()*800;o.type='sine';
-      const t=ctx.currentTime;
-      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.13,t+0.03);
-      g.gain.linearRampToValueAtTime(0,t+0.2);
-      o.connect(g);g.connect(natureGain);o.start(t);
-      try{o.stop(t+0.25);}catch(e){}
-      const tid=setTimeout(chirp,interval+Math.random()*interval*1.5);
-      stops.push(()=>{clearTimeout(tid);try{o.stop();}catch(e){}g.disconnect();});
+  // ── 共用：持续噪声层 ──
+  function noiseLayer(type,filterType,cutoff,q,gainVal,lfoHz=0,lfoDelta=0){
+    const src=ctx.createBufferSource();src.buffer=type==='brown'?brownBuf():pinkBuf();src.loop=true;
+    const f=ctx.createBiquadFilter();f.type=filterType;f.frequency.value=cutoff;if(q)f.Q.value=q;
+    const g=ctx.createGain();g.gain.value=gainVal;
+    if(lfoHz>0){
+      const lfo=ctx.createOscillator();lfo.type='sine';lfo.frequency.value=lfoHz*sf;
+      const lg=ctx.createGain();lg.gain.value=lfoDelta;
+      lfo.connect(lg);lg.connect(g.gain);lfo.start();
+      lfoNodes.push({n:lfo,base:lfoHz});
+      stops.push(()=>{try{lfo.stop();}catch(e){}lg.disconnect();});
     }
-    const tid=setTimeout(chirp,600+Math.random()*2000);
+    src.connect(f);f.connect(g);g.connect(natureGain);src.start();
+    stops.push(()=>{try{src.stop();}catch(e){}g.disconnect();});
+  }
+  // 连接 LFO 到 BPF 中心频率（用于溪流/春风/秋风的频率调制）
+  function freqLFO(bpfNode,hz,delta){
+    const lfo=ctx.createOscillator();lfo.type='sine';lfo.frequency.value=hz*sf;
+    const lg=ctx.createGain();lg.gain.value=delta;
+    lfo.connect(lg);lg.connect(bpfNode.frequency);lfo.start();
+    lfoNodes.push({n:lfo,base:hz});
+    stops.push(()=>{try{lfo.stop();}catch(e){}lg.disconnect();});
+  }
+  // ── 共用：单音符（鸟鸣/雁鸣/宇宙闪光 等） ──
+  function playNote(freq,t,dur,amp,type='sine',glide=0){
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.type=type;o.frequency.value=glide?freq*(1+glide):freq;
+    if(glide)o.frequency.exponentialRampToValueAtTime(freq,t+0.06);
+    const att=Math.min(0.05,dur*0.3),rel=Math.min(0.06,dur*0.3);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(amp,t+att);
+    g.gain.setValueAtTime(amp,t+dur-rel);g.gain.linearRampToValueAtTime(0,t+dur);
+    o.connect(g);g.connect(natureGain);o.start(t);try{o.stop(t+dur+0.08);}catch(e){}
+  }
+  // ── 共用：周期事件调度（密度驱动间隔） ──
+  function sched(fn,baseMs,jitter=0.6){
+    let alive=true;
+    function loop(){
+      if(!alive||!ctx)return;
+      fn();
+      const ms=(baseMs/sf)*(1+(Math.random()-0.5)*jitter);
+      const tid=setTimeout(loop,ms);
+      stops.push(()=>clearTimeout(tid));
+    }
+    const tid=setTimeout(loop,600+Math.random()*2000);
     stops.push(()=>{alive=false;clearTimeout(tid);});
   }
-  function addStream(){
-    const sr=ctx.sampleRate,len=sr*4,buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
-    let last=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.2;}
-    const src=ctx.createBufferSource();src.buffer=buf;src.loop=true;
-    const bpf=ctx.createBiquadFilter();bpf.type='bandpass';bpf.frequency.value=350;bpf.Q.value=0.9;
-    const lfo=ctx.createOscillator();lfo.frequency.value=0.25;
-    const lfoG=ctx.createGain();lfoG.gain.value=120;
-    lfo.connect(lfoG);lfoG.connect(bpf.frequency);
-    src.connect(bpf);bpf.connect(natureGain);src.start();lfo.start();
-    stops.push(()=>{try{src.stop();}catch(e){}try{lfo.stop();}catch(e){}bpf.disconnect();lfoG.disconnect();});
+
+  // ══════════════════════════════════════════════
+  // 木·春·角：东方/生发/肝气条达
+  // 《素问》"东方生风，风生木，木生酸，酸生肝，肝生筋…在音为角"
+  // ══════════════════════════════════════════════
+  if(id==='oriole'){
+    // 黄鹂·仓庚 — 两个黄鹂鸣翠柳（杜甫）· 《诗经·豳风》"有鸣仓庚"
+    // 黄鹂叫声：清脆高亢的3-4音节下行乐句，频率范围 1800-2600 Hz
+    noiseLayer('pink','lowpass',350,0,0.05); // 春林底噪
+    const phrases=[
+      [{f:2300,d:.14},{f:2550,d:.11},{f:2150,d:.19},{f:1950,d:.26}], // 四音下行
+      [{f:2050,d:.17},{f:2300,d:.10},{f:2450,d:.08},{f:1900,d:.28}], // 先升后降
+      [{f:2400,d:.09},{f:2150,d:.14},{f:2300,d:.11},{f:2050,d:.24}], // 波动收尾
+    ];
+    sched(()=>{
+      const p=phrases[Math.floor(Math.random()*phrases.length)];
+      let t=ctx.currentTime+0.05;
+      for(const{f,d}of p){
+        playNote(f,t,d,0.11,'sine',0.03); // 主音
+        playNote(f*2,t,d*0.6,0.025,'sine',0); // 泛音增厚
+        t+=d+0.04;
+      }
+    },5500,0.5);
   }
-  if(id==='rain-birds'){addRain(550);addBirds(2200,3500);}
-  else if(id==='rain') {addRain(420);}
-  else if(id==='stream'){addStream();}
-  else if(id==='birds') {addBirds(2400,1800);}
-  return {stop:()=>stops.forEach(f=>{try{f();}catch(e){}})};
+
+  else if(id==='cuckoo'){
+    // 杜鹃·布谷 — 《唐诗》"布谷声声催春耕" · 《蜀道难》"子规啼夜月"
+    // 布谷鸟：两音节 "布——谷"，降小三度，~660Hz→540Hz，每6-14秒一次
+    noiseLayer('pink','lowpass',320,0,0.04); // 远山底噪
+    sched(()=>{
+      const t=ctx.currentTime;
+      // "布" — 较长，带轻微颤音
+      playNote(645,t,0.35,0.13,'sine',0.02);
+      playNote(968,t,0.28,0.035,'sine',0); // 泛音
+      // "谷" — 较短，低小三度（降约 6 半音≈330Hz×1.64≈540）
+      playNote(535,t+0.42,0.30,0.13,'sine',0.01);
+      playNote(803,t+0.42,0.22,0.030,'sine',0);
+    },8000,0.45);
+  }
+
+  else if(id==='spring-wind'){
+    // 春风·萌 — 《春夜喜雨》"随风潜入夜" · 和风/东风/生发之气
+    // 粉噪带通慢扫 + LFO振幅调制 + 偶发叶片沙沙
+    const src=ctx.createBufferSource();src.buffer=pinkBuf();src.loop=true;
+    const bpf=ctx.createBiquadFilter();bpf.type='bandpass';bpf.frequency.value=280;bpf.Q.value=1.3;
+    const g=ctx.createGain();g.gain.value=0.32;
+    freqLFO(bpf,0.07,90); // BPF中心缓慢扫频 ±90Hz
+    const alfo=ctx.createOscillator();alfo.type='sine';alfo.frequency.value=0.11*sf;
+    const alg=ctx.createGain();alg.gain.value=0.07;
+    alfo.connect(alg);alg.connect(g.gain);alfo.start();
+    lfoNodes.push({n:alfo,base:0.11});
+    src.connect(bpf);bpf.connect(g);g.connect(natureGain);src.start();
+    stops.push(()=>{try{src.stop();}catch(e){}try{alfo.stop();}catch(e){}g.disconnect();alg.disconnect();});
+    // 叶片沙沙
+    sched(()=>{
+      const t=ctx.currentTime;
+      const rs=ctx.createBufferSource();rs.buffer=pinkBuf(1);
+      const hpf=ctx.createBiquadFilter();hpf.type='highpass';hpf.frequency.value=1800;
+      const rg=ctx.createGain();
+      rg.gain.setValueAtTime(0,t);rg.gain.linearRampToValueAtTime(0.06,t+0.08);rg.gain.linearRampToValueAtTime(0,t+0.5);
+      rs.connect(hpf);hpf.connect(rg);rg.connect(natureGain);rs.start(t);try{rs.stop(t+0.6);}catch(e){}
+    },6000,0.5);
+  }
+
+  // ══════════════════════════════════════════════
+  // 火·夏·徵：南方/生长/心气宣通
+  // 《素问》"南方生热，热生火，火生苦，苦生心…在音为徵"
+  // ══════════════════════════════════════════════
+  else if(id==='cicada'){
+    // 蝉鸣·知了 — 《楚辞·九怀》"蝉嗷鸣以矢兮" · 《庄子》"蟪蛄不知春秋"
+    // 蝉：多只同时鸣叫，携带频率约 3700-5000 Hz，AM 调制频率 ~130-180 Hz（翅膀振动）
+    const specs=[{cf:3750,am:145},{cf:4150,am:162},{cf:4600,am:155},{cf:5000,am:170}];
+    specs.forEach(({cf,am},i)=>{
+      const osc=ctx.createOscillator();osc.type='sawtooth';osc.frequency.value=cf+(Math.random()-0.5)*180;
+      const bpf=ctx.createBiquadFilter();bpf.type='bandpass';bpf.frequency.value=cf;bpf.Q.value=5;
+      const outG=ctx.createGain();outG.gain.value=0.055;
+      // AM：翅膀振动产生的幅度调制
+      const amOsc=ctx.createOscillator();amOsc.type='sine';amOsc.frequency.value=am*sf;
+      const amG=ctx.createGain();amG.gain.value=0.038;
+      amOsc.connect(amG);amG.connect(outG.gain);
+      osc.connect(bpf);bpf.connect(outG);outG.connect(natureGain);
+      osc.start();amOsc.start();
+      lfoNodes.push({n:amOsc,base:am});
+      stops.push(()=>{try{osc.stop();}catch(e){}try{amOsc.stop();}catch(e){}outG.disconnect();amG.disconnect();});
+    });
+    // 夏日背景薄噪（阳光热感）
+    noiseLayer('pink','highpass',600,0,0.03);
+  }
+
+  else if(id==='summer-rain'){
+    // 夏雨·骤 — 《望湖楼醉书》"黑云翻墨未遮山，白雨跳珠乱入船"
+    // 两层：粉噪（雨声主体，截止1200Hz）+ 棕噪（低频雷声地板）
+    noiseLayer('pink','lowpass',1250,0,0.62,0.22,0.08); // 大雨 + 轻微起伏
+    noiseLayer('brown','lowpass',110,0,0.22); // 远雷低鸣
+  }
+
+  // ══════════════════════════════════════════════
+  // 土·长夏·宫：中央/化生/脾气运化
+  // 《素问》"中央生湿，湿生土，土生甘，甘生脾…在音为宫"
+  // ══════════════════════════════════════════════
+  else if(id==='light-rain'){
+    // 细雨·润 — 《春夜喜雨》"随风潜入夜，润物细无声"（杜甫）
+    // 粉噪低通 580Hz，极轻微振幅起伏
+    noiseLayer('pink','lowpass',580,0,0.50,0.18,0.05);
+  }
+
+  else if(id==='stream'){
+    // 山涧·潺 — 《山居秋暝》"明月松间照，清泉石上流"（王维）
+    // 棕噪带通 + LFO频率调制 + 偶发水滴叮咚
+    const src=ctx.createBufferSource();src.buffer=brownBuf(6);src.loop=true;
+    const bpf=ctx.createBiquadFilter();bpf.type='bandpass';bpf.frequency.value=370;bpf.Q.value=1.1;
+    freqLFO(bpf,0.18,110);
+    const g=ctx.createGain();g.gain.value=0.48;
+    src.connect(bpf);bpf.connect(g);g.connect(natureGain);src.start();
+    stops.push(()=>{try{src.stop();}catch(e){}g.disconnect();});
+    // 水滴泠泠（叮咚声）
+    sched(()=>{
+      const t=ctx.currentTime;
+      const f=1200+Math.random()*900;
+      playNote(f,t,0.09,0.055,'sine');
+      if(Math.random()>0.5)playNote(f*1.5,t+0.11,0.07,0.03,'sine');
+    },900,0.55);
+  }
+
+  // ══════════════════════════════════════════════
+  // 金·秋·商：西方/收敛/肺气肃降
+  // 《素问》"西方生燥，燥生金，金生辛，辛生肺…在音为商"
+  // ══════════════════════════════════════════════
+  else if(id==='geese'){
+    // 鸿雁·南飞 — 《礼记·月令》"孟秋之月，鸿雁来" · 《范仲淹·渔家傲》"衡阳雁去无留意"
+    // 鸿雁：沙哑洪亮的鸣叫 ~420-540 Hz，锯齿波+BPF模拟鼻腔共鸣，4-7只成群过境
+    noiseLayer('pink','lowpass',400,0,0.04); // 秋空底噪
+    sched(()=>{
+      const count=4+Math.floor(Math.random()*4);
+      let t=ctx.currentTime+0.1;
+      const baseFreqs=[440,495,466,522,488,476,510];
+      for(let i=0;i<count;i++){
+        const bf=baseFreqs[i%baseFreqs.length]*(0.93+Math.random()*0.14);
+        const dur=0.30+Math.random()*0.18;
+        const osc=ctx.createOscillator();osc.type='sawtooth';osc.frequency.value=bf;
+        const bpf=ctx.createBiquadFilter();bpf.type='bandpass';bpf.frequency.value=bf*1.4;bpf.Q.value=3.5;
+        const g=ctx.createGain();
+        g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.10,t+0.07);
+        g.gain.setValueAtTime(0.10,t+dur-0.07);g.gain.linearRampToValueAtTime(0,t+dur);
+        osc.connect(bpf);bpf.connect(g);g.connect(natureGain);
+        osc.start(t);try{osc.stop(t+dur+0.08);}catch(e){}
+        t+=dur+0.12+Math.random()*0.25;
+      }
+    },22000,0.4);
+  }
+
+  else if(id==='autumn-wind'){
+    // 秋风·爽 — 《秋风辞》"秋风起兮白云飞"（汉武帝）· 金气肃杀/燥烈
+    // 粉噪低通 + 较快阵风LFO + 干燥枯叶沙沙（高频爆破）
+    const src=ctx.createBufferSource();src.buffer=pinkBuf();src.loop=true;
+    const bpf=ctx.createBiquadFilter();bpf.type='bandpass';bpf.frequency.value=450;bpf.Q.value=1.0;
+    freqLFO(bpf,0.14,180);
+    const g=ctx.createGain();g.gain.value=0.38;
+    const alfo=ctx.createOscillator();alfo.type='sine';alfo.frequency.value=0.17*sf;
+    const alg=ctx.createGain();alg.gain.value=0.13;
+    alfo.connect(alg);alg.connect(g.gain);alfo.start();
+    lfoNodes.push({n:alfo,base:0.17});
+    src.connect(bpf);bpf.connect(g);g.connect(natureGain);src.start();
+    stops.push(()=>{try{src.stop();}catch(e){}try{alfo.stop();}catch(e){}g.disconnect();alg.disconnect();});
+    // 枯叶沙响（比春风更干、更急）
+    sched(()=>{
+      const t=ctx.currentTime;
+      const rs=ctx.createBufferSource();rs.buffer=pinkBuf(1);
+      const hpf=ctx.createBiquadFilter();hpf.type='highpass';hpf.frequency.value=2600;
+      const rg=ctx.createGain();
+      rg.gain.setValueAtTime(0,t);rg.gain.linearRampToValueAtTime(0.09,t+0.04);rg.gain.linearRampToValueAtTime(0,t+0.38);
+      rs.connect(hpf);hpf.connect(rg);rg.connect(natureGain);rs.start(t);try{rs.stop(t+0.45);}catch(e){}
+    },2500,0.55);
+  }
+
+  else if(id==='cricket'){
+    // 蟋蟀·秋夜 — 《诗经·豳风》"蟋蟀在堂，岁聿其莫" · 《促织》"夜深织声急"
+    // 蟋蟀：正弦波 ~3800-4500Hz，AM 调制 ~18-26Hz（翅膀摩擦节律），多只同时
+    const specs=[{f:3900,am:20},{f:4200,am:22},{f:3750,am:19},{f:4500,am:24}];
+    specs.forEach(({f,am})=>{
+      const freq=f*(0.96+Math.random()*0.08);
+      const osc=ctx.createOscillator();osc.type='sine';osc.frequency.value=freq;
+      const g=ctx.createGain();g.gain.value=0.042+Math.random()*0.018;
+      const amOsc=ctx.createOscillator();amOsc.type='sine';amOsc.frequency.value=am*sf;
+      const amG=ctx.createGain();amG.gain.value=0.030;
+      amOsc.connect(amG);amG.connect(g.gain);
+      osc.connect(g);g.connect(natureGain);
+      osc.start();amOsc.start();
+      lfoNodes.push({n:amOsc,base:am});
+      stops.push(()=>{try{osc.stop();}catch(e){}try{amOsc.stop();}catch(e){}g.disconnect();amG.disconnect();});
+    });
+    noiseLayer('brown','lowpass',200,0,0.05); // 秋夜底噪
+  }
+
+  // ══════════════════════════════════════════════
+  // 水·冬·羽：北方/蛰藏/肾气封藏
+  // 《素问》"北方生寒，寒生水，水生咸，咸生肾…在音为羽"
+  // ══════════════════════════════════════════════
+  else if(id==='ocean'){
+    // 海浪·涌 — 《将进酒》"君不见黄河之水天上来" · 大水浩渺/肾水之象
+    // 棕噪（海浪低鸣）+ 慢速波浪LFO（~0.09Hz=11秒一浪）+ 粉噪带通（浪尖水沫）
+    const src=ctx.createBufferSource();src.buffer=brownBuf(8);src.loop=true;
+    const lpf=ctx.createBiquadFilter();lpf.type='lowpass';lpf.frequency.value=420;
+    const wG=ctx.createGain();wG.gain.value=0.50;
+    const waveLFO=ctx.createOscillator();waveLFO.type='sine';waveLFO.frequency.value=0.09*sf;
+    const wlg=ctx.createGain();wlg.gain.value=0.28;
+    waveLFO.connect(wlg);wlg.connect(wG.gain);waveLFO.start();
+    lfoNodes.push({n:waveLFO,base:0.09});
+    src.connect(lpf);lpf.connect(wG);wG.connect(natureGain);src.start();
+    stops.push(()=>{try{src.stop();}catch(e){}try{waveLFO.stop();}catch(e){}wG.disconnect();wlg.disconnect();});
+    // 浪尖水沫（粉噪带通，略快于主浪）
+    const src2=ctx.createBufferSource();src2.buffer=pinkBuf();src2.loop=true;
+    const bpf2=ctx.createBiquadFilter();bpf2.type='bandpass';bpf2.frequency.value=1100;bpf2.Q.value=0.7;
+    const wG2=ctx.createGain();wG2.gain.value=0.14;
+    const waveLFO2=ctx.createOscillator();waveLFO2.type='sine';waveLFO2.frequency.value=0.094*sf;
+    const wlg2=ctx.createGain();wlg2.gain.value=0.09;
+    waveLFO2.connect(wlg2);wlg2.connect(wG2.gain);waveLFO2.start();
+    lfoNodes.push({n:waveLFO2,base:0.094});
+    src2.connect(bpf2);bpf2.connect(wG2);wG2.connect(natureGain);src2.start();
+    stops.push(()=>{try{src2.stop();}catch(e){}try{waveLFO2.stop();}catch(e){}wG2.disconnect();wlg2.disconnect();});
+  }
+
+  else if(id==='cosmos'){
+    // 星空·玄 — 《庄子·逍遥游》"天之苍苍，其正色邪" · 玄冥/北方/无极之象
+    // 4个低频正弦纯音（A1/E2/A2/E3·五度关系）+ 极缓频率漂移 + 星光闪烁
+    const drones=[{f:55,a:0.11},{f:82.4,a:0.09},{f:110,a:0.07},{f:164.8,a:0.05}];
+    drones.forEach(({f,a})=>{
+      const osc=ctx.createOscillator();osc.type='sine';osc.frequency.value=f;
+      const driftLFO=ctx.createOscillator();driftLFO.type='sine';driftLFO.frequency.value=0.02+Math.random()*0.025;
+      const driftG=ctx.createGain();driftG.gain.value=f*0.007; // ±0.7% 微漂
+      driftLFO.connect(driftG);driftG.connect(osc.frequency);
+      const g=ctx.createGain();g.gain.value=a;
+      osc.connect(g);g.connect(natureGain);
+      osc.start();driftLFO.start();
+      stops.push(()=>{try{osc.stop();}catch(e){}try{driftLFO.stop();}catch(e){}g.disconnect();driftG.disconnect();});
+    });
+    // 星光闪烁（极高频微弱正弦，随机出现）
+    sched(()=>{
+      const t=ctx.currentTime;
+      const f=2800+Math.random()*3200;
+      playNote(f,t,0.35+Math.random()*0.6,0.035,'sine');
+    },3500,0.55);
+  }
+
+  // ══════════════════════════════════════════════
+  // 融合：雨·晨鸟（《春晓》"春眠不觉晓，处处闻啼鸟"）
+  // ══════════════════════════════════════════════
+  else if(id==='rain-birds'){
+    noiseLayer('pink','lowpass',560,0,0.43,0.20,0.05);
+    const rPhrases=[
+      [{f:2200,d:.14},{f:2420,d:.10},{f:2050,d:.20}],
+      [{f:1900,d:.16},{f:2100,d:.12},{f:1800,d:.22}],
+      [{f:2350,d:.09},{f:2050,d:.14},{f:2200,d:.10},{f:1950,d:.22}],
+    ];
+    sched(()=>{
+      const p=rPhrases[Math.floor(Math.random()*rPhrases.length)];
+      let t=ctx.currentTime+0.05;
+      for(const{f,d}of p){playNote(f,t,d,0.09,'sine',0.02);t+=d+0.04;}
+    },4000,0.55);
+  }
+
+  return{
+    stop:()=>stops.forEach(f=>{try{f();}catch(e){}}),
+    setDensity:(d)=>{
+      sf=0.5+(d-1)*0.25;
+      lfoNodes.forEach(({n,base})=>{try{n.frequency.value=base*sf;}catch(e){}});
+    }
+  };
 }
 function switchNature(id,feedback=true){
   activeNature=id;
@@ -942,7 +1260,10 @@ $('vol').addEventListener('input',e=>{if(masterGain)masterGain.gain.setTargetAtT
 $('vi').addEventListener('input',e=>{$('viV').textContent=e.target.value;if(instrGain)instrGain.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,.05);});
 $('vn').addEventListener('input',e=>{$('vnV').textContent=e.target.value;if(natureGain)natureGain.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,.05);});
 $('vb').addEventListener('input',e=>{$('vbV').textContent=e.target.value;if(noiseGain)noiseGain.gain.setTargetAtTime(e.target.value/100*0.28,ctx.currentTime,.05);});
-$('ksDensity').addEventListener('input',e=>{ksDensity=+e.target.value;});
+$('ksDensity').addEventListener('input',e=>{
+  ksDensity=+e.target.value;
+  if(natureSynth&&natureSynth.setDensity)natureSynth.setDensity(ksDensity);
+});
 
 // 乐器
 document.querySelectorAll('[data-instr]').forEach(btn=>{
