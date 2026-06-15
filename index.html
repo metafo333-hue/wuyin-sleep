@@ -457,16 +457,16 @@ footer a{color:var(--ink3)}
 // 混响：ConvolverNode·IR=3s·pow衰减·wetGain=0.24
 // 自然声：HTMLAudioElement·loop·createMediaElementSource·切换pause旧play新
 
-const AUDIO_BASE='https://github.com/metafo333-hue/wuyin-sleep/releases/download/v2.0-audio/';
+const AUDIO_BASE='./';
 
 const INSTRUMENTS={
-  'guqin-a':{label:'宫·古琴·秋风辞',file:'guqin-a.mp3',tone:'gong',acc:'var(--gold)',badge:'宫·土·脾',sub:'古琴·秋风辞 · 真实录音'},
-  'dizi-a':  {label:'商·笛',          file:'dizi-a.mp3', tone:'shang',acc:'var(--gray)',badge:'商·金·肺',sub:'竹笛样本 · CC0'},
-  'guqin-b': {label:'角·古琴·醉渔唱晚',file:'guqin-b.mp3',tone:'jue',acc:'var(--green)',badge:'角·木·肝',sub:'古琴·醉渔唱晚 · 真实录音'},
-  'erhu-a':  {label:'徵·二胡·二泉映月',file:'erhu-a.mp3', tone:'zhi',acc:'var(--red)',badge:'徵·火·心',sub:'二胡·二泉映月 · 真实录音'},
-  'ks-yu':   {label:'羽·拨弦',         file:null,         tone:'yu', acc:'var(--blue)',badge:'羽·水·肾',sub:'五音合成拨弦'},
+  'guqin-a':{label:'宫·古琴·秋风辞',file:'gong.mp3',  tone:'gong', acc:'var(--gold)', badge:'宫·土·脾',sub:'古琴·秋风辞 · 真实录音'},
+  'dizi-a':  {label:'商·笛',          file:'shang.mp3', tone:'shang',acc:'var(--gray)', badge:'商·金·肺',sub:'竹笛样本 · CC0'},
+  'guqin-b': {label:'角·古琴·醉渔唱晚',file:'jue.mp3',  tone:'jue',  acc:'var(--green)',badge:'角·木·肝',sub:'古琴·醉渔唱晚 · 真实录音'},
+  'erhu-a':  {label:'徵·二胡·二泉映月',file:'zhi.mp3',  tone:'zhi',  acc:'var(--red)',  badge:'徵·火·心',sub:'二胡·二泉映月 · 真实录音'},
+  'ks-yu':   {label:'羽·拨弦',         file:null,        tone:'yu',   acc:'var(--blue)', badge:'羽·水·肾',sub:'五音合成拨弦'},
 };
-const NATURES={'rain-birds':'rain-birds.mp3','rain':'rain.mp3','stream':'stream.mp3','birds':'birds.mp3','none':null};
+const NATURES={'rain-birds':'mixed.mp3','rain':'seamless.mp3','stream':'seamless.mp3','birds':'mixed.mp3','none':null};
 const SCENES={
   mountain:{instr:'guqin-a',nature:'rain-birds',vi:68,vn:58,vb:20,noise:'brown'},
   bamboo:  {instr:'dizi-a', nature:'stream',    vi:64,vn:52,vb:28,noise:'wind'},
@@ -652,7 +652,7 @@ async function loadInstrBuf(id){
   if(instrBufs[id])return instrBufs[id];
   const info=INSTRUMENTS[id]; if(!info.file)return null;
   try{
-    const r=await fetch(AUDIO_BASE+info.file,{mode:'cors'});
+    const r=await fetch(AUDIO_BASE+info.file);
     if(!r.ok)throw new Error(r.status);
     instrBufs[id]=await ctx.decodeAudioData(await r.arrayBuffer());
     return instrBufs[id];
@@ -686,7 +686,7 @@ function getNatureEl(id){
   if(!id||id==='none')return null;
   if(natureEls[id])return natureEls[id];
   const el=document.createElement('audio');
-  el.crossOrigin='anonymous';el.loop=true;el.preload='auto';el.src=AUDIO_BASE+NATURES[id];
+  el.loop=true;el.preload='auto';el.src=AUDIO_BASE+NATURES[id];
   document.body.appendChild(el);natureEls[id]=el;return el;
 }
 function switchNature(id,feedback=true){
