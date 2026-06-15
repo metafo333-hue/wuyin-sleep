@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>五音 · 国风助眠白噪音</title>
+<meta name="theme-color" content="#A8322D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="五音">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --paper:#F4EFE4; --paper-2:#EBE3D2; --ink:#23211C; --ink-2:#5A5446;
+    --cinnabar:#A8322D; --gong:#C9A24B; --shang:#A9A293; --jue:#5E7E5B; --zhi:#B5443A; --yu:#3E5468;
+    --line:rgba(35,33,28,.12); --card:#FBF8F0; --shadow:0 8px 30px rgba(35,33,28,.10);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:"Noto Serif SC","Songti SC",STSong,serif;background:var(--paper);color:var(--ink);
+    line-height:1.7;-webkit-font-smoothing:antialiased;min-height:100vh;overflow-x:hidden;
+    background-image:radial-gradient(circle at 20% 8%,rgba(168,50,45,.04),transparent 40%),radial-gradient(circle at 85% 82%,rgba(62,84,104,.05),transparent 45%);}
+  .wrap{max-width:560px;margin:0 auto;padding:0 20px calc(env(safe-area-inset-bottom) + 28px)}
+  header{display:flex;align-items:center;justify-content:space-between;padding:calc(env(safe-area-inset-top) + 18px) 0 8px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .seal{width:42px;height:42px;border-radius:8px;background:var(--cinnabar);color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700;box-shadow:var(--shadow);font-family:"Songti SC",serif}
+  .brand h1{font-size:19px;margin:0;letter-spacing:2px;font-weight:700}
+  .brand small{display:block;font-size:11px;color:var(--ink-2);letter-spacing:3px}
+  #installBtn{display:none;font-size:12px;padding:7px 13px;border:1px solid var(--cinnabar);color:var(--cinnabar);background:var(--card);border-radius:999px;font-family:inherit;cursor:pointer}
+  .tag{font-size:12px;padding:5px 12px;border:1px solid var(--line);border-radius:999px;color:var(--ink-2);background:var(--card)}
+  .hero{text-align:center;padding:24px 0 12px}
+  .hero .big{font-size:clamp(27px,8.5vw,38px);font-weight:700;letter-spacing:3px;margin:0 0 8px}
+  .hero .big em{font-style:normal;color:var(--cinnabar)}
+  .hero p{font-size:13.5px;color:var(--ink-2);margin:0 auto;max-width:34ch}
+  .player{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin:20px 0;box-shadow:var(--shadow)}
+  .now{display:flex;align-items:center;gap:16px}
+  .disc{width:84px;height:84px;border-radius:50%;flex:0 0 auto;position:relative;background:conic-gradient(var(--gong),#8a6d2f,var(--gong));box-shadow:inset 0 0 0 6px rgba(255,255,255,.25),var(--shadow);display:grid;place-items:center}
+  .disc::after{content:"";width:22px;height:22px;border-radius:50%;background:var(--card);border:1px solid var(--line)}
+  .disc.spin{animation:spin 8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .meta h2{margin:0;font-size:18px;letter-spacing:1px}
+  .meta .sub{font-size:12.5px;color:var(--ink-2);margin-top:3px}
+  .meta .five{display:inline-block;margin-top:6px;font-size:11px;color:#fff;background:var(--gong);padding:2px 9px;border-radius:6px;letter-spacing:1px}
+  .controls{display:flex;align-items:center;gap:14px;margin-top:20px}
+  .play{width:60px;height:60px;border-radius:50%;border:none;flex:0 0 auto;cursor:pointer;background:var(--cinnabar);color:#fff;font-size:24px;display:grid;place-items:center;box-shadow:0 6px 18px rgba(168,50,45,.35);transition:transform .12s}
+  .play:active{transform:scale(.93)}
+  .vol{flex:1;display:flex;align-items:center;gap:9px}.vol span{font-size:15px;color:var(--ink-2)}
+  .vol input{flex:1;accent-color:var(--cinnabar);height:5px}
+  .mixer{margin-top:18px;border-top:1px dashed var(--line);padding-top:14px}
+  .mixer .lbl{font-size:12px;color:var(--ink-2);letter-spacing:2px;margin-bottom:10px}
+  .mrow{display:flex;align-items:center;gap:12px;margin:9px 0}
+  .mrow .ico{width:26px;text-align:center;font-size:15px}.mrow .nm{flex:0 0 58px;font-size:12.5px}
+  .mrow input{flex:1;accent-color:var(--jue);height:4px}
+  .timer{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
+  .timer .lbl{font-size:12px;color:var(--ink-2);letter-spacing:2px;margin-bottom:10px;display:flex;justify-content:space-between}
+  .timer .lbl b{color:var(--cinnabar);font-weight:700;letter-spacing:0}
+  .chips{display:flex;gap:8px}
+  .chip{flex:1;text-align:center;font-size:13px;padding:9px 0;border:1px solid var(--line);border-radius:10px;background:var(--card);cursor:pointer;min-height:40px;transition:.15s}
+  .chip.on{background:var(--cinnabar);color:#fff;border-color:var(--cinnabar)}
+  section h3{font-size:15px;letter-spacing:3px;margin:26px 0 4px;display:flex;align-items:center;gap:8px}
+  section h3::before{content:"";width:14px;height:2px;background:var(--cinnabar)}
+  .sec-note{font-size:12px;color:var(--ink-2);margin:0 0 14px}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .wuyin{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px 6px;text-align:center;cursor:pointer;transition:transform .12s;min-height:74px}
+  .wuyin:active{transform:scale(.95)}
+  .wuyin .yin{font-size:22px;font-weight:700}.wuyin .wx{font-size:11px;color:var(--ink-2);margin-top:3px}.wuyin .zang{font-size:10px;color:var(--ink-2);opacity:.8}
+  .wuyin[data-k=gong]{border-top:3px solid var(--gong)} .wuyin[data-k=gong] .yin{color:var(--gong)}
+  .wuyin[data-k=shang]{border-top:3px solid var(--shang)} .wuyin[data-k=shang] .yin{color:#7d776a}
+  .wuyin[data-k=jue]{border-top:3px solid var(--jue)} .wuyin[data-k=jue] .yin{color:var(--jue)}
+  .wuyin[data-k=zhi]{border-top:3px solid var(--zhi)} .wuyin[data-k=zhi] .yin{color:var(--zhi)}
+  .wuyin[data-k=yu]{border-top:3px solid var(--yu)} .wuyin[data-k=yu] .yin{color:var(--yu)}
+  .wuyin.on{box-shadow:0 0 0 2px var(--cinnabar)}
+  footer{text-align:center;font-size:11px;color:var(--ink-2);padding:24px 0 10px;line-height:2}
+  footer .dim{opacity:.7}
+  .hint{font-size:11px;color:var(--ink-2);text-align:center;margin-top:14px;opacity:.85}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="seal">音</div><div><h1>五音</h1><small>宫 · 商 · 角 · 徵 · 羽</small></div></div>
+    <button id="installBtn">＋ 装到桌面</button>
+    <div class="tag">国风助眠</div>
+  </header>
+  <div class="hero">
+    <p class="big">五音入<em>五脏</em>，一声安神</p>
+    <p>中医五音 × 自然白噪，浏览器实时合成。可调、可定时、可离线。</p>
+  </div>
+  <div class="player">
+    <div class="now">
+      <div class="disc" id="disc"></div>
+      <div class="meta"><h2 id="trackName">宫 · 雨打芭蕉</h2><div class="sub" id="trackSub">棕噪铺底 + 雨势起伏 + 宫·徵纯五度</div><span class="five" id="trackFive">宫 · 土 · 脾</span></div>
+    </div>
+    <div class="controls">
+      <button class="play" id="playBtn" aria-label="播放">▶</button>
+      <div class="vol"><span>🔈</span><input type="range" id="vol" min="0" max="100" value="70" aria-label="总音量"></div>
+    </div>
+    <div class="mixer">
+      <div class="lbl">实时混音</div>
+      <div class="mrow"><span class="ico">🟤</span><span class="nm">床声</span><input type="range" id="mxBed"  min="0" max="100" value="70"></div>
+      <div class="mrow"><span class="ico">🌊</span><span class="nm">起伏</span><input type="range" id="mxMod"  min="0" max="100" value="55"></div>
+      <div class="mrow"><span class="ico">🎴</span><span class="nm">五音</span><input type="range" id="mxPad"  min="0" max="100" value="40"></div>
+    </div>
+    <div class="timer">
+      <div class="lbl"><span>睡眠定时</span><b id="timerState">关</b></div>
+      <div class="chips" id="chips">
+        <div class="chip on" data-min="0">关</div><div class="chip" data-min="15">15分</div><div class="chip" data-min="30">30分</div><div class="chip" data-min="60">60分</div><div class="chip" data-min="90">90分</div>
+      </div>
+    </div>
+  </div>
+  <section>
+    <h3>五音调式</h3>
+    <p class="sec-note">宫商角徵羽对应五行五脏，点选切换音色。</p>
+    <div class="grid" id="wuyinGrid">
+      <div class="wuyin on" data-k="gong"><div class="yin">宫</div><div class="wx">土</div><div class="zang">脾</div></div>
+      <div class="wuyin" data-k="shang"><div class="yin">商</div><div class="wx">金</div><div class="zang">肺</div></div>
+      <div class="wuyin" data-k="jue"><div class="yin">角</div><div class="wx">木</div><div class="zang">肝</div></div>
+      <div class="wuyin" data-k="zhi"><div class="yin">徵</div><div class="wx">火</div><div class="zang">心</div></div>
+      <div class="wuyin" data-k="yu"><div class="yin">羽</div><div class="wx">水</div><div class="zang">肾</div></div>
+    </div>
+    <div class="hint">浏览器端 Web Audio 实时合成 · 零音频文件 · 零版权 · 可离线</div>
+  </section>
+  <footer><div>五音 · 国风助眠白噪音</div><div class="dim">添加到主屏，睡前一键打开 · v1</div></footer>
+</div>
+<script>
+// ===== 五音配置（三分损益频率 + 各调式音色/起伏）=====
+const TONES = {
+  gong: {name:'宫 · 雨打芭蕉', five:'宫 · 土 · 脾', sub:'棕噪铺底 + 雨势起伏 + 宫·徵纯五度', accent:getC('--gong'), filt:'bandpass', freq:1200, q:0.7, lfo:0.07, pad:[130.81,196.22]},
+  shang:{name:'商 · 金风',     five:'商 · 金 · 肺', sub:'粉噪高通 + 风声起伏 + 商·羽纯五度', accent:'#7d776a', filt:'bandpass', freq:900,  q:0.5, lfo:0.10, pad:[147.17,220.66]},
+  jue:  {name:'角 · 林泉',     five:'角 · 木 · 肝', sub:'带通中频 + 流泉起伏 + 角调纯五度', accent:getC('--jue'),  filt:'bandpass', freq:1500, q:1.0, lfo:0.28, pad:[165.56,248.34]},
+  zhi:  {name:'徵 · 炉火',     five:'徵 · 火 · 心', sub:'低通暖声 + 炉火起伏 + 徵·商纯五度', accent:getC('--zhi'),  filt:'lowpass',  freq:520,  q:0.7, lfo:0.18, pad:[196.22,294.33]},
+  yu:   {name:'羽 · 沧浪',     five:'羽 · 水 · 肾', sub:'低频带通 + 浪涌起伏 + 羽·角纯五度', accent:getC('--yu'),   filt:'lowpass',  freq:380,  q:0.7, lfo:0.06, pad:[220.66,330.99]},
+};
+function getC(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
+
+let ctx=null, nodes=null, cur='gong', playing=false, userVol=0.7;
+const $=id=>document.getElementById(id);
+
+function makeBrownBuffer(c){
+  const len=c.sampleRate*4, buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
+  let last=0;
+  for(let i=0;i<len;i++){const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*3.4;}
+  // 首尾微淡化，循环无爆音
+  const f=Math.floor(c.sampleRate*0.05);
+  for(let i=0;i<f;i++){const g=i/f; d[i]*=g; d[len-1-i]*=g;}
+  return buf;
+}
+function build(){
+  ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const t=TONES[cur];
+  const noise=ctx.createBufferSource(); noise.buffer=makeBrownBuffer(ctx); noise.loop=true;
+  const bedFilter=ctx.createBiquadFilter(); bedFilter.type=t.filt; bedFilter.frequency.value=t.freq; bedFilter.Q.value=t.q;
+  const modGain=ctx.createGain(); modGain.gain.value=0.75;
+  const bedGain=ctx.createGain(); bedGain.gain.value=$('mxBed').value/100;
+  const lfo=ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value=t.lfo;
+  const lfoDepth=ctx.createGain(); lfoDepth.gain.value=0.75*($('mxMod').value/100);
+  const pad1=ctx.createOscillator(); pad1.type='sine'; pad1.frequency.value=t.pad[0];
+  const pad2=ctx.createOscillator(); pad2.type='sine'; pad2.frequency.value=t.pad[1];
+  const padGain=ctx.createGain(); padGain.gain.value=0;
+  const padLP=ctx.createBiquadFilter(); padLP.type='lowpass'; padLP.frequency.value=600;
+  const master=ctx.createGain(); master.gain.value=userVol;
+  // 连线
+  noise.connect(bedFilter); bedFilter.connect(modGain); modGain.connect(bedGain); bedGain.connect(master);
+  lfo.connect(lfoDepth); lfoDepth.connect(modGain.gain);
+  pad1.connect(padLP); pad2.connect(padLP); padLP.connect(padGain); padGain.connect(master);
+  master.connect(ctx.destination);
+  noise.start(); lfo.start(); pad1.start(); pad2.start();
+  // 五音 pad 缓入
+  padGain.gain.setTargetAtTime(0.9*($('mxPad').value/100), ctx.currentTime, 4);
+  nodes={noise,bedFilter,modGain,bedGain,lfo,lfoDepth,pad1,pad2,padGain,master};
+}
+function applyTone(smooth){
+  if(!nodes)return; const t=TONES[cur], now=ctx.currentTime;
+  nodes.bedFilter.type=t.filt;
+  nodes.bedFilter.frequency.setTargetAtTime(t.freq, now, smooth?0.4:0);
+  nodes.bedFilter.Q.setTargetAtTime(t.q, now, 0.3);
+  nodes.lfo.frequency.setTargetAtTime(t.lfo, now, 0.3);
+  nodes.pad1.frequency.setTargetAtTime(t.pad[0], now, smooth?0.5:0);
+  nodes.pad2.frequency.setTargetAtTime(t.pad[1], now, smooth?0.5:0);
+}
+function setPlay(p){playing=p; $('playBtn').textContent=p?'❚❚':'▶'; $('disc').classList.toggle('spin',p);
+  if('mediaSession' in navigator) try{navigator.mediaSession.playbackState=p?'playing':'paused';}catch(e){}}
+
+$('playBtn').onclick=async()=>{
+  if(!ctx){ build(); }
+  if(playing){ await ctx.suspend(); setPlay(false); }
+  else{ await ctx.resume(); setPlay(true); }
+};
+$('vol').addEventListener('input',e=>{userVol=e.target.value/100; if(nodes)nodes.master.gain.setTargetAtTime(userVol,ctx.currentTime,0.05);});
+$('mxBed').addEventListener('input',e=>{if(nodes)nodes.bedGain.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,0.05);});
+$('mxMod').addEventListener('input',e=>{if(nodes)nodes.lfoDepth.gain.setTargetAtTime(0.75*(e.target.value/100),ctx.currentTime,0.05);});
+$('mxPad').addEventListener('input',e=>{if(nodes)nodes.padGain.gain.setTargetAtTime(0.9*(e.target.value/100),ctx.currentTime,0.05);});
+
+function selectTone(k){
+  cur=k; const t=TONES[k];
+  $('trackName').textContent=t.name; $('trackFive').textContent=t.five; $('trackSub').textContent=t.sub;
+  $('trackFive').style.background=t.accent;
+  $('disc').style.background=`conic-gradient(${t.accent},#7a6a52,${t.accent})`;
+  applyTone(true);
+  if('mediaSession' in navigator) try{navigator.mediaSession.metadata=new MediaMetadata({title:t.name,artist:'五音 · 国风助眠',album:t.five});}catch(e){}
+}
+document.querySelectorAll('.wuyin').forEach(el=>{el.onclick=()=>{
+  document.querySelectorAll('.wuyin').forEach(x=>x.classList.remove('on')); el.classList.add('on'); selectTone(el.dataset.k);
+};});
+
+// 睡眠定时
+let timer=null;
+document.querySelectorAll('.chip').forEach(c=>{c.onclick=()=>{
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on');
+  if(timer)clearTimeout(timer); const min=+c.dataset.min;
+  if(min===0){$('timerState').textContent='关'; return;}
+  $('timerState').textContent=min+' 分钟后停';
+  timer=setTimeout(()=>{
+    if(nodes&&ctx){ nodes.master.gain.setTargetAtTime(0,ctx.currentTime,5); setTimeout(async()=>{await ctx.suspend(); setPlay(false); nodes.master.gain.value=userVol;},20000);}
+    $('timerState').textContent='已停'; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); document.querySelector('.chip[data-min="0"]').classList.add('on');
+  }, min*60*1000);
+};});
+
+// 锁屏/后台
+if('mediaSession' in navigator){
+  navigator.mediaSession.setActionHandler('play',()=>{$('playBtn').click();});
+  navigator.mediaSession.setActionHandler('pause',()=>{$('playBtn').click();});
+}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&playing&&ctx&&ctx.state==='suspended')ctx.resume(); });
+
+// PWA 安装
+let deferred=null; const ib=$('installBtn');
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;ib.style.display='block';});
+ib.onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;ib.style.display='none';};
+window.addEventListener('appinstalled',()=>ib.style.display='none');
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

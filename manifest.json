@@ -1,0 +1,16 @@
+{
+  "name": "五音 · 国风助眠白噪音",
+  "short_name": "五音",
+  "description": "中医五音 × 自然白噪，合成你的入眠之声。可定时、可后台、可离线。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#23211C",
+  "theme_color": "#A8322D",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
