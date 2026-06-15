@@ -216,6 +216,15 @@ html,body{height:100%;background:var(--paper);color:var(--ink);
 .disc.beat{animation:disc-beat .4s ease}
 .sbtn{transition:.12s,box-shadow .12s}
 .sbtn.on{box-shadow:0 0 0 2px rgba(168,50,45,.25)}
+.tone-card.recmd:not(.on){border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,162,75,.2)}
+.tone-card.recmd .tc-n::after{content:" ✦";color:var(--gold)}
+#toneDetail{display:none;background:var(--paper2);border-radius:10px;padding:12px;
+  margin-top:8px;font-size:12px;color:var(--ink2);animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.wx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin-bottom:8px}
+.wx-val{font-size:18px;font-weight:700;line-height:1.2}
+.wx-k{font-size:10px;color:var(--ink3);margin-top:1px}
+.mood-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:4px}
 
 footer{font-size:10px;color:var(--ink3);line-height:2;text-align:center;
   margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
@@ -255,8 +264,14 @@ footer a{color:var(--ink3)}
   <div class="dh">今晚的状态</div>
   <div class="mood-grid">
     <button class="mood-btn" data-mood="anxious">😤 焦虑</button>
-    <button class="mood-btn" data-mood="tired">😩 疲惫</button>
+    <button class="mood-btn" data-mood="tired">😩 身体疲惫</button>
+    <button class="mood-btn" data-mood="insomnia">😶 失眠难入</button>
     <button class="mood-btn" data-mood="racing">🌀 思绪乱</button>
+    <button class="mood-btn" data-mood="lonely">🫙 孤独心空</button>
+    <button class="mood-btn" data-mood="irritable">😬 烦躁</button>
+    <button class="mood-btn" data-mood="grief">🌧 委屈</button>
+    <button class="mood-btn" data-mood="homesick">🏡 思乡</button>
+    <button class="mood-btn" data-mood="meditate">🧘 冥想</button>
     <button class="mood-btn" data-mood="calm">😌 想放松</button>
   </div>
   <div class="dh">节气推荐</div>
@@ -381,13 +396,13 @@ footer a{color:var(--ink3)}
     <div class="tone-card" data-t="zhi"><div class="tc-z">徵</div><div class="tc-n">G·196Hz</div></div>
     <div class="tone-card" data-t="yu"><div class="tc-z">羽</div><div class="tc-n">A·220Hz</div></div>
   </div>
+  <div id="toneDetail"></div>
   <div class="synth-params">
     <div class="sp-row"><span class="sp-lbl">合成音量</span><input type="range" id="sv" min="0" max="100" value="50"><span class="sp-v" id="svV">50</span></div>
     <div class="sp-row"><span class="sp-lbl">混响深度</span><input type="range" id="sr" min="0" max="100" value="40"><span class="sp-v" id="srV">40</span></div>
     <div class="sp-row"><span class="sp-lbl">泛音厚度</span><input type="range" id="sh" min="0" max="100" value="55"><span class="sp-v" id="shV">55</span></div>
     <div class="synth-note">
-      合成标准：基频 + 2倍频(×0.5) + 3倍频(×0.25) · 轻微失谐±0.02%增厚度<br>
-      多音叠加自动归一化防止过载 · 泛音厚度=0时为纯正弦波
+      基频 + 2倍频(×0.5) + 3倍频(×0.25) · 失谐±0.02%增厚度 · 多音叠加√N归一
     </div>
   </div>
 </div>
@@ -453,16 +468,32 @@ const INSTRUMENTS={
 };
 const NATURES={'rain-birds':'rain-birds.mp3','rain':'rain.mp3','stream':'stream.mp3','birds':'birds.mp3','none':null};
 const SCENES={
-  mountain:{instr:'guqin-a',nature:'rain-birds',vi:68,vn:58,vb:20},
-  bamboo:  {instr:'dizi-a', nature:'stream',    vi:64,vn:52,vb:28},
-  night:   {instr:'erhu-a', nature:'rain',      vi:60,vn:65,vb:14},
-  ripple:  {instr:'ks-yu',  nature:'birds',     vi:76,vn:42,vb:10},
+  mountain:{instr:'guqin-a',nature:'rain-birds',vi:68,vn:58,vb:20,noise:'brown'},
+  bamboo:  {instr:'dizi-a', nature:'stream',    vi:64,vn:52,vb:28,noise:'wind'},
+  night:   {instr:'erhu-a', nature:'rain',      vi:60,vn:65,vb:14,noise:'pink'},
+  ripple:  {instr:'ks-yu',  nature:'birds',     vi:76,vn:42,vb:10,noise:'brown'},
 };
+// 五行完整对应
+const WUXING={
+  gong: {colorVal:'var(--gold)',colorName:'黄',element:'土',organ:'脾·胃',taste:'甘·甜',emotion:'思·念',season:'长夏',tip:'适合：疲惫·消化不良·安心宁神'},
+  shang:{colorVal:'var(--gray)',colorName:'白',element:'金',organ:'肺·大肠',taste:'辛·辣',emotion:'悲·忧',season:'秋',  tip:'适合：思绪纷乱·肺气不降·忧虑'},
+  jue:  {colorVal:'var(--green)',colorName:'青',element:'木',organ:'肝·胆',taste:'酸·涩',emotion:'怒·郁',season:'春',  tip:'适合：烦躁抑郁·疏肝解郁·孤独'},
+  zhi:  {colorVal:'var(--red)',colorName:'赤',element:'火',organ:'心·小肠',taste:'苦',emotion:'喜·亢',season:'夏',    tip:'适合：焦虑心悸·失眠多梦·心火旺'},
+  yu:   {colorVal:'var(--blue)',colorName:'黑·深',element:'水',organ:'肾·膀胱',taste:'咸',emotion:'恐·惊',season:'冬',tip:'适合：恐惧不安·腰酸乏力·入眠'},
+};
+
+// 情绪→全配置（10态）
 const MOODS={
-  anxious:{scene:'night',  msg:'羽调细雨 · 适合平息焦虑'},
-  tired:  {scene:'mountain',msg:'宫调古琴 · 适合舒缓疲惫'},
-  racing: {scene:'bamboo', msg:'商调笛音 · 适合平静思绪'},
-  calm:   {scene:'ripple', msg:'羽调拨弦 · 适合安然放松'},
+  anxious:  {scene:'night',  noise:'pink', tones:['zhi','yu'],  msg:'徵羽调·细雨粉噪·平息心火焦虑'},
+  tired:    {scene:'mountain',noise:'brown',tones:['gong'],     msg:'宫调·山林晨雨·补脾安胃舒疲'},
+  insomnia: {scene:'night',  noise:'pink', tones:['gong','yu'], msg:'宫羽双调·细雨粉噪·专为失眠设计'},
+  racing:   {scene:'bamboo', noise:'wind', tones:['shang'],     msg:'商调·溪流风声·清肺降气静思'},
+  lonely:   {scene:'night',  noise:'brown',tones:['jue'],       msg:'角调·二胡细雨·疏肝解郁慰孤独'},
+  irritable:{scene:'bamboo', noise:'wind', tones:['shang','jue'],msg:'商角调·流水风声·降气平躁动'},
+  grief:    {scene:'night',  noise:'pink', tones:['jue','yu'],  msg:'角羽调·细雨粉噪·疏解悲伤委屈'},
+  homesick: {scene:'mountain',noise:'brown',tones:['jue'],      msg:'角调·古琴晨雨·疏肝怀念思乡'},
+  meditate: {scene:'ripple', noise:'pink', tones:['gong','shang','jue'],msg:'三调叠合·鸟鸣粉噪·深度冥想'},
+  calm:     {scene:'ripple', noise:'brown',tones:['yu'],        msg:'羽调·拨弦鸟啼·滋肾安神入眠'},
 };
 const TONEFREQ={gong:130.81,shang:146.83,jue:164.81,zhi:196.00,yu:220.00};
 const PENTA=[130.81,146.83,164.81,196.00,220.00,261.63,293.66,329.63];
@@ -728,6 +759,23 @@ function updateMeta(id){
   const b=$('nowBadge');b.textContent=info.badge||'';b.style.background=info.acc||'var(--gold)';
   $('disc').style.background=`conic-gradient(${info.acc||'var(--gold)'},#7a6a52,${info.acc||'var(--gold)'})`;
   if('mediaSession'in navigator)try{navigator.mediaSession.metadata=new MediaMetadata({title:info.label||'五音',artist:'五音助眠'});}catch(e){}
+  // 推荐五音高亮（对应乐器调）
+  if(info.tone)document.querySelectorAll('.tone-card').forEach(c=>c.classList.toggle('recmd',c.dataset.t===info.tone));
+}
+
+// 五行详情显示
+function showToneDetail(key){
+  const wx=WUXING[key];const d=$('toneDetail');if(!wx){d.style.display='none';return;}
+  d.style.display='block';
+  d.innerHTML=`<div class="wx-grid">
+    <div><div class="wx-val" style="color:${wx.colorVal}">${wx.colorName}</div><div class="wx-k">五色</div></div>
+    <div><div class="wx-val">${wx.element}</div><div class="wx-k">五行</div></div>
+    <div><div class="wx-val" style="font-size:13px">${wx.taste}</div><div class="wx-k">五味</div></div>
+  </div>
+  <div style="font-size:11.5px;padding-top:8px;border-top:1px dashed var(--line)">
+    <span style="color:var(--ink3)">脏腑</span> ${wx.organ} &ensp; <span style="color:var(--ink3)">志</span> ${wx.emotion} &ensp; <span style="color:var(--ink3)">季</span> ${wx.season}
+  </div>
+  <div style="font-size:11px;color:var(--ink3);margin-top:5px">✦ ${wx.tip}</div>`;
 }
 
 // 定时器
@@ -806,6 +854,7 @@ function applyScene(sc){
     if(natureGain)natureGain.gain.setTargetAtTime(sc.vn/100,ctx.currentTime,0.4);
     if(noiseGain)noiseGain.gain.setTargetAtTime(sc.vb/100*0.28,ctx.currentTime,0.4);
   }
+  if(sc.noise&&sc.noise!==activeNoise)switchNoise(sc.noise);
   if(sc.instr!==activeInstr){
     document.querySelectorAll('[data-instr]').forEach(b=>b.classList.toggle('on',b.dataset.instr===sc.instr));
     switchInstr(sc.instr);
@@ -815,10 +864,32 @@ function applyScene(sc){
     switchNature(sc.nature);
   }
 }
-function handleScene(key){
+function handleScene(key,closeDrawer=true){
   const sc=SCENES[key];if(!sc)return;
   document.querySelectorAll('[data-scene]').forEach(b=>b.classList.toggle('on',b.dataset.scene===key));
   applyScene(sc);
+  if(closeDrawer){$('ldrawer').classList.remove('open');$('overlay').classList.remove('show');}
+}
+
+// 情绪一键入场（全配置联动）
+function applyMood(key){
+  const m=MOODS[key];if(!m)return;
+  // 场景
+  if(m.scene){
+    const sc=SCENES[m.scene];
+    if(sc){
+      document.querySelectorAll('[data-scene]').forEach(b=>b.classList.toggle('on',b.dataset.scene===m.scene));
+      applyScene(sc);
+    }
+  }
+  // 额外底噪类型覆盖
+  if(m.noise&&m.noise!==activeNoise)switchNoise(m.noise);
+  // 推荐五音（视觉提示，不自动激活音效）
+  if(m.tones){
+    document.querySelectorAll('.tone-card').forEach(c=>c.classList.toggle('recmd',m.tones.includes(c.dataset.t)));
+    if(m.tones.length===1)showToneDetail(m.tones[0]);
+  }
+  showToast(m.msg);
   $('ldrawer').classList.remove('open');$('overlay').classList.remove('show');
 }
 
@@ -864,7 +935,7 @@ document.querySelectorAll('[data-nature]').forEach(btn=>{
 document.querySelectorAll('[data-scene]').forEach(btn=>{btn.onclick=()=>handleScene(btn.dataset.scene);});
 // 情绪
 document.querySelectorAll('[data-mood]').forEach(btn=>{
-  btn.onclick=()=>{const m=MOODS[btn.dataset.mood];if(!m)return;handleScene(m.scene);showToast(m.msg);};
+  btn.onclick=()=>applyMood(btn.dataset.mood);
 });
 // 定时
 document.querySelectorAll('.chip').forEach(c=>{
@@ -879,12 +950,20 @@ document.querySelectorAll('.nav-item').forEach(item=>{
     if(t==='mine'){renderStats();renderCombos();}
   };
 });
-// 五音合成
+// 五音合成（点击切换音效 + 显示五行详情）
+let lastToneShown=null;
 document.querySelectorAll('.tone-card').forEach(card=>{
   card.onclick=()=>{
     if(!ctx)buildGraph();const t=card.dataset.t;
     card.classList.toggle('on');
-    if(card.classList.contains('on'))startTone(t);else stopTone(t);
+    if(card.classList.contains('on')){startTone(t);showToneDetail(t);lastToneShown=t;}
+    else{
+      stopTone(t);
+      // 如果还有其他音开着，显示最后激活的
+      const onCards=[...document.querySelectorAll('.tone-card.on')];
+      if(onCards.length){const nt=onCards[onCards.length-1].dataset.t;showToneDetail(nt);lastToneShown=nt;}
+      else{$('toneDetail').style.display='none';lastToneShown=null;}
+    }
   };
 });
 $('sv').addEventListener('input',e=>{$('svV').textContent=e.target.value;if(synthGain)synthGain.gain.setTargetAtTime(e.target.value/100*0.6,ctx.currentTime,.05);});
