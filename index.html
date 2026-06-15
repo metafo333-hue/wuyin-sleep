@@ -62,9 +62,10 @@
   section h3::before{content:"";width:14px;height:2px;background:var(--cinnabar)}
   .sec-note{font-size:12px;color:var(--ink-2);margin:0 0 14px}
   .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-  .wuyin{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:14px 6px;text-align:center;cursor:pointer;transition:transform .12s;min-height:74px}
+  .wuyin{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:13px 6px;text-align:center;cursor:pointer;transition:transform .12s;min-height:80px}
   .wuyin:active{transform:scale(.95)}
-  .wuyin .yin{font-size:22px;font-weight:700}.wuyin .wx{font-size:11px;color:var(--ink-2);margin-top:3px}.wuyin .zang{font-size:10px;color:var(--ink-2);opacity:.8}
+  .wuyin .yin{font-size:22px;font-weight:700;line-height:1.1}.wuyin .note{font-size:10px;color:var(--ink-2);letter-spacing:1px}
+  .wuyin .wx{font-size:11px;color:var(--ink-2);margin-top:2px}.wuyin .zang{font-size:10px;color:var(--ink-2);opacity:.8}
   .wuyin[data-k=gong]{border-top:3px solid var(--gong)} .wuyin[data-k=gong] .yin{color:var(--gong)}
   .wuyin[data-k=shang]{border-top:3px solid var(--shang)} .wuyin[data-k=shang] .yin{color:#7d776a}
   .wuyin[data-k=jue]{border-top:3px solid var(--jue)} .wuyin[data-k=jue] .yin{color:var(--jue)}
@@ -85,22 +86,22 @@
   </header>
   <div class="hero">
     <p class="big">五音入<em>五脏</em>，一声安神</p>
-    <p>中医五音 × 自然白噪，浏览器实时合成。可调、可定时、可离线。</p>
+    <p>标准五声音阶拨弦 × 柔和自然底噪，择一调入眠。</p>
   </div>
   <div class="player">
     <div class="now">
       <div class="disc" id="disc"></div>
-      <div class="meta"><h2 id="trackName">宫 · 雨打芭蕉</h2><div class="sub" id="trackSub">棕噪铺底 + 雨势起伏 + 宫·徵纯五度</div><span class="five" id="trackFive">宫 · 土 · 脾</span></div>
+      <div class="meta"><h2 id="trackName">宫调 · 土 · 脾</h2><div class="sub" id="trackSub">主音 宫(C) · 古琴式拨弦 + 柔雨底</div><span class="five" id="trackFive">宫 · 土 · 脾</span></div>
     </div>
     <div class="controls">
       <button class="play" id="playBtn" aria-label="播放">▶</button>
-      <div class="vol"><span>🔈</span><input type="range" id="vol" min="0" max="100" value="70" aria-label="总音量"></div>
+      <div class="vol"><span>🔈</span><input type="range" id="vol" min="0" max="100" value="72" aria-label="总音量"></div>
     </div>
     <div class="mixer">
       <div class="lbl">实时混音</div>
-      <div class="mrow"><span class="ico">🟤</span><span class="nm">床声</span><input type="range" id="mxBed"  min="0" max="100" value="70"></div>
-      <div class="mrow"><span class="ico">🌊</span><span class="nm">起伏</span><input type="range" id="mxMod"  min="0" max="100" value="55"></div>
-      <div class="mrow"><span class="ico">🎴</span><span class="nm">五音</span><input type="range" id="mxPad"  min="0" max="100" value="40"></div>
+      <div class="mrow"><span class="ico">🎴</span><span class="nm">五音拨弦</span><input type="range" id="mxPad" min="0" max="100" value="80"></div>
+      <div class="mrow"><span class="ico">🌧️</span><span class="nm">自然底</span><input type="range" id="mxBed" min="0" max="100" value="28"></div>
+      <div class="mrow"><span class="ico">🍃</span><span class="nm">疏密</span><input type="range" id="mxDen" min="0" max="100" value="50"></div>
     </div>
     <div class="timer">
       <div class="lbl"><span>睡眠定时</span><b id="timerState">关</b></div>
@@ -111,100 +112,135 @@
   </div>
   <section>
     <h3>五音调式</h3>
-    <p class="sec-note">宫商角徵羽对应五行五脏，点选切换音色。</p>
+    <p class="sec-note">标准五声音阶（十二平均律）· 点选切换主音调式。</p>
     <div class="grid" id="wuyinGrid">
-      <div class="wuyin on" data-k="gong"><div class="yin">宫</div><div class="wx">土</div><div class="zang">脾</div></div>
-      <div class="wuyin" data-k="shang"><div class="yin">商</div><div class="wx">金</div><div class="zang">肺</div></div>
-      <div class="wuyin" data-k="jue"><div class="yin">角</div><div class="wx">木</div><div class="zang">肝</div></div>
-      <div class="wuyin" data-k="zhi"><div class="yin">徵</div><div class="wx">火</div><div class="zang">心</div></div>
-      <div class="wuyin" data-k="yu"><div class="yin">羽</div><div class="wx">水</div><div class="zang">肾</div></div>
+      <div class="wuyin on" data-k="gong"><div class="yin">宫</div><div class="note">C</div><div class="wx">土</div><div class="zang">脾</div></div>
+      <div class="wuyin" data-k="shang"><div class="yin">商</div><div class="note">D</div><div class="wx">金</div><div class="zang">肺</div></div>
+      <div class="wuyin" data-k="jue"><div class="yin">角</div><div class="note">E</div><div class="wx">木</div><div class="zang">肝</div></div>
+      <div class="wuyin" data-k="zhi"><div class="yin">徵</div><div class="note">G</div><div class="wx">火</div><div class="zang">心</div></div>
+      <div class="wuyin" data-k="yu"><div class="yin">羽</div><div class="note">A</div><div class="wx">水</div><div class="zang">肾</div></div>
     </div>
-    <div class="hint">浏览器端 Web Audio 实时合成 · 零音频文件 · 零版权 · 可离线</div>
+    <div class="hint">标准五声音阶 · Karplus-Strong 拨弦合成 · 零版权 · 可离线</div>
   </section>
-  <footer><div>五音 · 国风助眠白噪音</div><div class="dim">添加到主屏，睡前一键打开 · v1</div></footer>
+  <footer><div>五音 · 国风助眠白噪音</div><div class="dim">添加到主屏，睡前一键打开 · v1.1</div></footer>
 </div>
 <script>
-// ===== 五音配置（三分损益频率 + 各调式音色/起伏）=====
-const TONES = {
-  gong: {name:'宫 · 雨打芭蕉', five:'宫 · 土 · 脾', sub:'棕噪铺底 + 雨势起伏 + 宫·徵纯五度', accent:getC('--gong'), filt:'bandpass', freq:1200, q:0.7, lfo:0.07, pad:[130.81,196.22]},
-  shang:{name:'商 · 金风',     five:'商 · 金 · 肺', sub:'粉噪高通 + 风声起伏 + 商·羽纯五度', accent:'#7d776a', filt:'bandpass', freq:900,  q:0.5, lfo:0.10, pad:[147.17,220.66]},
-  jue:  {name:'角 · 林泉',     five:'角 · 木 · 肝', sub:'带通中频 + 流泉起伏 + 角调纯五度', accent:getC('--jue'),  filt:'bandpass', freq:1500, q:1.0, lfo:0.28, pad:[165.56,248.34]},
-  zhi:  {name:'徵 · 炉火',     five:'徵 · 火 · 心', sub:'低通暖声 + 炉火起伏 + 徵·商纯五度', accent:getC('--zhi'),  filt:'lowpass',  freq:520,  q:0.7, lfo:0.18, pad:[196.22,294.33]},
-  yu:   {name:'羽 · 沧浪',     five:'羽 · 水 · 肾', sub:'低频带通 + 浪涌起伏 + 羽·角纯五度', accent:getC('--yu'),   filt:'lowpass',  freq:380,  q:0.7, lfo:0.06, pad:[220.66,330.99]},
-};
 function getC(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim();}
-
-let ctx=null, nodes=null, cur='gong', playing=false, userVol=0.7;
+// 标准五声音阶（十二平均律，C 为宫）· 低八度更安神 + 中八度点缀
+const PENTA = [130.81,146.83,164.81,196.00,220.00, 261.63,293.66,329.63]; // 宫商角徵羽(C3..A3)+宫商角(C4..E4)
+const TONES = {
+  gong: {z:'宫', name:'宫调 · 土 · 脾', five:'宫 · 土 · 脾', sub:'主音 宫(C) · 古琴式拨弦 + 柔雨底', accent:getC('--gong'), tonic:130.81, bedF:900,  lfo:0.06},
+  shang:{z:'商', name:'商调 · 金 · 肺', five:'商 · 金 · 肺', sub:'主音 商(D) · 拨弦 + 清风底',     accent:'#7d776a',     tonic:146.83, bedF:1200, lfo:0.09},
+  jue:  {z:'角', name:'角调 · 木 · 肝', five:'角 · 木 · 肝', sub:'主音 角(E) · 拨弦 + 林泉底',     accent:getC('--jue'), tonic:164.81, bedF:1500, lfo:0.18},
+  zhi:  {z:'徵', name:'徵调 · 火 · 心', five:'徵 · 火 · 心', sub:'主音 徵(G) · 拨弦 + 暖底',       accent:getC('--zhi'), tonic:196.00, bedF:520,  lfo:0.13},
+  yu:   {z:'羽', name:'羽调 · 水 · 肾', five:'羽 · 水 · 肾', sub:'主音 羽(A) · 拨弦 + 浪涌底',     accent:getC('--yu'),  tonic:220.00, bedF:380,  lfo:0.05},
+};
 const $=id=>document.getElementById(id);
+let ctx=null, g=null, cur='gong', playing=false, userVol=0.72, pluckTimer=null;
+const ksCache=new Map();
 
-function makeBrownBuffer(c){
-  const len=c.sampleRate*4, buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0);
-  let last=0;
-  for(let i=0;i<len;i++){const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*3.4;}
-  // 首尾微淡化，循环无爆音
-  const f=Math.floor(c.sampleRate*0.05);
-  for(let i=0;i<f;i++){const g=i/f; d[i]*=g; d[len-1-i]*=g;}
+// ===== Karplus-Strong 拨弦合成（古琴/古筝式音色）=====
+function ksBuffer(freq){
+  if(ksCache.has(freq)) return ksCache.get(freq);
+  const sr=ctx.sampleRate, N=Math.max(2,Math.round(sr/freq));
+  const dur=Math.min(6, 2.4 + 160/freq), len=Math.round(sr*dur);
+  const buf=ctx.createBuffer(1,len,sr), out=buf.getChannelData(0);
+  const line=new Float32Array(N);
+  for(let i=0;i<N;i++) line[i]=Math.random()*2-1;
+  for(let i=1;i<N;i++) line[i]=0.5*(line[i]+line[i-1]); // 柔化激励（少高频刺耳）
+  let idx=0; const damp=0.9965;
+  for(let i=0;i<len;i++){
+    const cur=line[idx], nxt=line[(idx+1)%N], v=0.5*(cur+nxt)*damp;
+    out[i]=cur; line[idx]=v; idx=(idx+1)%N;
+  }
+  const a=Math.round(sr*0.005); for(let i=0;i<a;i++) out[i]*=i/a;       // 软起音
+  const tl=Math.round(len*0.18); for(let i=0;i<tl;i++) out[len-1-i]*=1-i/tl; // 尾部渐隐
+  ksCache.set(freq,buf); return buf;
+}
+function makeImpulse(dur,decay){
+  const sr=ctx.sampleRate, len=Math.round(sr*dur), imp=ctx.createBuffer(2,len,sr);
+  for(let ch=0;ch<2;ch++){const d=imp.getChannelData(ch);
+    for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay);}
+  return imp;
+}
+function makeBrown(){
+  const sr=ctx.sampleRate, len=sr*4, buf=ctx.createBuffer(1,len,sr), d=buf.getChannelData(0);
+  let last=0; for(let i=0;i<len;i++){const w=Math.random()*2-1; last=(last+0.02*w)/1.02; d[i]=last*3.2;}
+  const f=Math.round(sr*0.05); for(let i=0;i<f;i++){const k=i/f; d[i]*=k; d[len-1-i]*=k;}
   return buf;
 }
 function build(){
   ctx=new (window.AudioContext||window.webkitAudioContext)();
   const t=TONES[cur];
-  const noise=ctx.createBufferSource(); noise.buffer=makeBrownBuffer(ctx); noise.loop=true;
-  const bedFilter=ctx.createBiquadFilter(); bedFilter.type=t.filt; bedFilter.frequency.value=t.freq; bedFilter.Q.value=t.q;
-  const modGain=ctx.createGain(); modGain.gain.value=0.75;
-  const bedGain=ctx.createGain(); bedGain.gain.value=$('mxBed').value/100;
-  const lfo=ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value=t.lfo;
-  const lfoDepth=ctx.createGain(); lfoDepth.gain.value=0.75*($('mxMod').value/100);
-  const pad1=ctx.createOscillator(); pad1.type='sine'; pad1.frequency.value=t.pad[0];
-  const pad2=ctx.createOscillator(); pad2.type='sine'; pad2.frequency.value=t.pad[1];
-  const padGain=ctx.createGain(); padGain.gain.value=0;
-  const padLP=ctx.createBiquadFilter(); padLP.type='lowpass'; padLP.frequency.value=600;
   const master=ctx.createGain(); master.gain.value=userVol;
-  // 连线
-  noise.connect(bedFilter); bedFilter.connect(modGain); modGain.connect(bedGain); bedGain.connect(master);
-  lfo.connect(lfoDepth); lfoDepth.connect(modGain.gain);
-  pad1.connect(padLP); pad2.connect(padLP); padLP.connect(padGain); padGain.connect(master);
-  master.connect(ctx.destination);
-  noise.start(); lfo.start(); pad1.start(); pad2.start();
-  // 五音 pad 缓入
-  padGain.gain.setTargetAtTime(0.9*($('mxPad').value/100), ctx.currentTime, 4);
-  nodes={noise,bedFilter,modGain,bedGain,lfo,lfoDepth,pad1,pad2,padGain,master};
+  const warm=ctx.createBiquadFilter(); warm.type='lowpass'; warm.frequency.value=3600; // 去顶部毛刺
+  master.connect(warm); warm.connect(ctx.destination);
+  // 混响
+  const reverb=ctx.createConvolver(); reverb.buffer=makeImpulse(3.2,2.4);
+  const wet=ctx.createGain(); wet.gain.value=0.32; reverb.connect(wet); wet.connect(master);
+  // 拨弦总线（dry + 送混响）
+  const padBus=ctx.createGain(); padBus.gain.value=$('mxPad').value/100; padBus.connect(master); padBus.connect(reverb);
+  // 自然底噪（柔，低）
+  const noise=ctx.createBufferSource(); noise.buffer=makeBrown(); noise.loop=true;
+  const bedF=ctx.createBiquadFilter(); bedF.type='lowpass'; bedF.frequency.value=t.bedF; bedF.Q.value=0.5;
+  const modG=ctx.createGain(); modG.gain.value=0.7;
+  const lfo=ctx.createOscillator(); lfo.frequency.value=t.lfo;
+  const lfoD=ctx.createGain(); lfoD.gain.value=0.5;
+  const bedG=ctx.createGain(); bedG.gain.value=0.35*($('mxBed').value/100);
+  noise.connect(bedF); bedF.connect(modG); modG.connect(bedG); bedG.connect(master);
+  lfo.connect(lfoD); lfoD.connect(modG.gain);
+  noise.start(); lfo.start();
+  g={master,reverb,padBus,bedF,bedG,modG,lfo,warm};
+  scheduleNext();
 }
-function applyTone(smooth){
-  if(!nodes)return; const t=TONES[cur], now=ctx.currentTime;
-  nodes.bedFilter.type=t.filt;
-  nodes.bedFilter.frequency.setTargetAtTime(t.freq, now, smooth?0.4:0);
-  nodes.bedFilter.Q.setTargetAtTime(t.q, now, 0.3);
-  nodes.lfo.frequency.setTargetAtTime(t.lfo, now, 0.3);
-  nodes.pad1.frequency.setTargetAtTime(t.pad[0], now, smooth?0.5:0);
-  nodes.pad2.frequency.setTargetAtTime(t.pad[1], now, smooth?0.5:0);
+function pickNote(){
+  const t=TONES[cur], r=Math.random();
+  // 主音权重高 + 同调五声音阶其余音 + 偶尔上八度
+  const scale=[t.tonic, t.tonic*9/8, t.tonic*81/64, t.tonic*3/2, t.tonic*27/16].map(snap);
+  if(r<0.34) return scale[0];
+  if(r<0.55) return scale[3];           // 五度
+  if(r<0.72) return scale[1];
+  if(r<0.85) return scale[4];
+  if(r<0.93) return scale[2];
+  return scale[0]*2;                    // 上八度点缀
+}
+function snap(f){ // 吸附到最近的标准五声音阶频率，保证"有标准"
+  let best=f,dmin=1e9; const pool=PENTA.concat(PENTA.map(x=>x*2));
+  pool.forEach(p=>{const d=Math.abs(p-f); if(d<dmin){dmin=d;best=p;}}); return best;
+}
+function pluck(freq,vel){
+  const src=ctx.createBufferSource(); src.buffer=ksBuffer(freq);
+  const ng=ctx.createGain(); ng.gain.value=vel; src.connect(ng); ng.connect(g.padBus); src.start();
+}
+function scheduleNext(){
+  if(!playing||!ctx) return;
+  pluck(pickNote(), 0.5+Math.random()*0.35);
+  const dens=$('mxDen').value/100;               // 疏密：0=很慢 1=较密
+  const gap=(3.6-2.4*dens)*(0.7+Math.random()*0.6); // 约 1.0~3.8s
+  pluckTimer=setTimeout(scheduleNext, gap*1000);
 }
 function setPlay(p){playing=p; $('playBtn').textContent=p?'❚❚':'▶'; $('disc').classList.toggle('spin',p);
   if('mediaSession' in navigator) try{navigator.mediaSession.playbackState=p?'playing':'paused';}catch(e){}}
 
 $('playBtn').onclick=async()=>{
-  if(!ctx){ build(); }
-  if(playing){ await ctx.suspend(); setPlay(false); }
-  else{ await ctx.resume(); setPlay(true); }
+  if(!ctx){ build(); setPlay(true); return; }
+  if(playing){ playing=false; if(pluckTimer)clearTimeout(pluckTimer); await ctx.suspend(); setPlay(false); }
+  else{ await ctx.resume(); setPlay(true); scheduleNext(); }
 };
-$('vol').addEventListener('input',e=>{userVol=e.target.value/100; if(nodes)nodes.master.gain.setTargetAtTime(userVol,ctx.currentTime,0.05);});
-$('mxBed').addEventListener('input',e=>{if(nodes)nodes.bedGain.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,0.05);});
-$('mxMod').addEventListener('input',e=>{if(nodes)nodes.lfoDepth.gain.setTargetAtTime(0.75*(e.target.value/100),ctx.currentTime,0.05);});
-$('mxPad').addEventListener('input',e=>{if(nodes)nodes.padGain.gain.setTargetAtTime(0.9*(e.target.value/100),ctx.currentTime,0.05);});
+$('vol').addEventListener('input',e=>{userVol=e.target.value/100; if(g)g.master.gain.setTargetAtTime(userVol,ctx.currentTime,0.05);});
+$('mxPad').addEventListener('input',e=>{if(g)g.padBus.gain.setTargetAtTime(e.target.value/100,ctx.currentTime,0.05);});
+$('mxBed').addEventListener('input',e=>{if(g)g.bedG.gain.setTargetAtTime(0.35*(e.target.value/100),ctx.currentTime,0.05);});
 
 function selectTone(k){
   cur=k; const t=TONES[k];
   $('trackName').textContent=t.name; $('trackFive').textContent=t.five; $('trackSub').textContent=t.sub;
   $('trackFive').style.background=t.accent;
   $('disc').style.background=`conic-gradient(${t.accent},#7a6a52,${t.accent})`;
-  applyTone(true);
+  if(g){ g.bedF.frequency.setTargetAtTime(t.bedF,ctx.currentTime,0.4); g.lfo.frequency.setTargetAtTime(t.lfo,ctx.currentTime,0.3); }
   if('mediaSession' in navigator) try{navigator.mediaSession.metadata=new MediaMetadata({title:t.name,artist:'五音 · 国风助眠',album:t.five});}catch(e){}
 }
-document.querySelectorAll('.wuyin').forEach(el=>{el.onclick=()=>{
-  document.querySelectorAll('.wuyin').forEach(x=>x.classList.remove('on')); el.classList.add('on'); selectTone(el.dataset.k);
-};});
+document.querySelectorAll('.wuyin').forEach(el=>{el.onclick=()=>{document.querySelectorAll('.wuyin').forEach(x=>x.classList.remove('on')); el.classList.add('on'); selectTone(el.dataset.k);};});
 
-// 睡眠定时
 let timer=null;
 document.querySelectorAll('.chip').forEach(c=>{c.onclick=()=>{
   document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); c.classList.add('on');
@@ -212,23 +248,15 @@ document.querySelectorAll('.chip').forEach(c=>{c.onclick=()=>{
   if(min===0){$('timerState').textContent='关'; return;}
   $('timerState').textContent=min+' 分钟后停';
   timer=setTimeout(()=>{
-    if(nodes&&ctx){ nodes.master.gain.setTargetAtTime(0,ctx.currentTime,5); setTimeout(async()=>{await ctx.suspend(); setPlay(false); nodes.master.gain.value=userVol;},20000);}
+    if(g&&ctx){ g.master.gain.setTargetAtTime(0,ctx.currentTime,6); setTimeout(async()=>{playing=false; if(pluckTimer)clearTimeout(pluckTimer); await ctx.suspend(); setPlay(false); g.master.gain.value=userVol;},22000);}
     $('timerState').textContent='已停'; document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on')); document.querySelector('.chip[data-min="0"]').classList.add('on');
   }, min*60*1000);
 };});
-
-// 锁屏/后台
-if('mediaSession' in navigator){
-  navigator.mediaSession.setActionHandler('play',()=>{$('playBtn').click();});
-  navigator.mediaSession.setActionHandler('pause',()=>{$('playBtn').click();});
-}
-document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&playing&&ctx&&ctx.state==='suspended')ctx.resume(); });
-
-// PWA 安装
+if('mediaSession' in navigator){navigator.mediaSession.setActionHandler('play',()=>$('playBtn').click());navigator.mediaSession.setActionHandler('pause',()=>$('playBtn').click());}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&playing&&ctx&&ctx.state==='suspended')ctx.resume();});
 let deferred=null; const ib=$('installBtn');
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;ib.style.display='block';});
 ib.onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;ib.style.display='none';};
-window.addEventListener('appinstalled',()=>ib.style.display='none');
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>
 </body>
