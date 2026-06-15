@@ -453,20 +453,16 @@ footer a{color:var(--ink3)}
 // KS拨弦：damp=0.9965·N=round(sr/freq)·时长=min(6,2.4+160/freq)·首5ms淡入·尾18%淡出
 //          密度1=间隔~5s·密度5=间隔~1.5s·随机±35%
 // 单色音：OscillatorNode·基频+2倍(×0.5)+3倍(×0.25)·失谐±0.02%·多音sqrt归一化
-// Crossfade：0.6s线性GainNode·旧淡出→新淡入·700ms后stop旧源
-// 混响：ConvolverNode·IR=3s·pow衰减·wetGain=0.24
-// 自然声：HTMLAudioElement·loop·createMediaElementSource·切换pause旧play新
-
-const AUDIO_BASE='./';
+// 全 Web Audio 合成：乐器层=KS拨弦·自然层=噪声合成·底噪层=棕/粉/白/风
+// 无外部音频文件依赖·零 CORS 问题·可完全离线
 
 const INSTRUMENTS={
-  'guqin-a':{label:'宫·古琴·秋风辞',file:'gong.mp3',  tone:'gong', acc:'var(--gold)', badge:'宫·土·脾',sub:'古琴·秋风辞 · 真实录音'},
-  'dizi-a':  {label:'商·笛',          file:'shang.mp3', tone:'shang',acc:'var(--gray)', badge:'商·金·肺',sub:'竹笛样本 · CC0'},
-  'guqin-b': {label:'角·古琴·醉渔唱晚',file:'jue.mp3',  tone:'jue',  acc:'var(--green)',badge:'角·木·肝',sub:'古琴·醉渔唱晚 · 真实录音'},
-  'erhu-a':  {label:'徵·二胡·二泉映月',file:'zhi.mp3',  tone:'zhi',  acc:'var(--red)',  badge:'徵·火·心',sub:'二胡·二泉映月 · 真实录音'},
-  'ks-yu':   {label:'羽·拨弦',         file:null,        tone:'yu',   acc:'var(--blue)', badge:'羽·水·肾',sub:'五音合成拨弦'},
+  'guqin-a':{label:'宫·古琴',file:null,tone:'gong', acc:'var(--gold)', badge:'宫·土·脾',sub:'五音合成 · 宫调 KS 拨弦'},
+  'dizi-a':  {label:'商·笛', file:null,tone:'shang',acc:'var(--gray)', badge:'商·金·肺',sub:'五音合成 · 商调 KS 拨弦'},
+  'guqin-b': {label:'角·古琴',file:null,tone:'jue',  acc:'var(--green)',badge:'角·木·肝',sub:'五音合成 · 角调 KS 拨弦'},
+  'erhu-a':  {label:'徵·弦鸣',file:null,tone:'zhi',  acc:'var(--red)',  badge:'徵·火·心',sub:'五音合成 · 徵调 KS 拨弦'},
+  'ks-yu':   {label:'羽·拨弦',file:null,tone:'yu',   acc:'var(--blue)', badge:'羽·水·肾',sub:'五音合成 · 羽调 KS 拨弦'},
 };
-const NATURES={'rain-birds':'mixed.mp3','rain':'seamless.mp3','stream':'seamless.mp3','birds':'mixed.mp3','none':null};
 const SCENES={
   mountain:{instr:'guqin-a',nature:'rain-birds',vi:68,vn:58,vb:20,noise:'brown'},
   bamboo:  {instr:'dizi-a', nature:'stream',    vi:64,vn:52,vb:28,noise:'wind'},
@@ -509,7 +505,7 @@ let masterGain,warmF,reverb,revWet,instrGain,natureGain,noiseGain,synthGain;
 let activeNoise='brown',noiseSrc=null,noiseLPF=null;
 let instrBufs={},instrSrc=null,instrSrcGain=null;
 let ksActive=false,ksTone='yu',ksTimer=null,ksDensity=3;
-let natureEls={},activeInstr='guqin-a',activeNature='rain-birds';
+let natureSynth=null,activeInstr='guqin-a',activeNature='rain-birds';
 let synthOscs={};
 let sleepStart=0,sleepDur=0,timerEnd=0,timerAF=null;
 let statMin=+localStorage.getItem('wy_min')||0;
@@ -649,14 +645,8 @@ function schedKS(){
 
 // Crossfade切换乐器
 async function loadInstrBuf(id){
-  if(instrBufs[id])return instrBufs[id];
-  const info=INSTRUMENTS[id]; if(!info.file)return null;
-  try{
-    const r=await fetch(AUDIO_BASE+info.file);
-    if(!r.ok)throw new Error(r.status);
-    instrBufs[id]=await ctx.decodeAudioData(await r.arrayBuffer());
-    return instrBufs[id];
-  }catch(e){console.warn('load fail',id,e);return null;}
+  const info=INSTRUMENTS[id]; if(!info||!info.file)return null;
+  return null;
 }
 async function switchInstr(id,cf=true){
   activeInstr=id; updateMeta(id);
@@ -680,29 +670,69 @@ async function switchInstr(id,cf=true){
   instrSrc=null; startKS(info.tone);
 }
 
-// 自然声切换
+// 自然声合成（纯 Web Audio · 零文件依赖）
 const NATURE_NAMES={'rain-birds':'雨·鸟鸣','rain':'细雨','stream':'溪流','birds':'鸟啼','none':'自然层静音'};
-function getNatureEl(id){
-  if(!id||id==='none')return null;
-  if(natureEls[id])return natureEls[id];
-  const el=document.createElement('audio');
-  el.loop=true;el.preload='auto';el.src=AUDIO_BASE+NATURES[id];
-  document.body.appendChild(el);natureEls[id]=el;return el;
+function makeNatureSynth(id){
+  if(!ctx||!id||id==='none')return null;
+  const stops=[];
+  function pinkBuf(){
+    const sr=ctx.sampleRate,len=sr*4,buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+    let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i=0;i<len;i++){const w=Math.random()*2-1;
+      b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;
+      b2=0.96900*b2+w*0.1538520;b3=0.86650*b3+w*0.3104856;
+      b4=0.55000*b4+w*0.5329522;b5=-0.7616*b5-w*0.0168980;
+      d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*0.11;b6=w*0.115926;}
+    return buf;
+  }
+  function addRain(cutoff){
+    const src=ctx.createBufferSource();src.buffer=pinkBuf();src.loop=true;
+    const lpf=ctx.createBiquadFilter();lpf.type='lowpass';lpf.frequency.value=cutoff;
+    src.connect(lpf);lpf.connect(natureGain);src.start();
+    stops.push(()=>{try{src.stop();}catch(e){}lpf.disconnect();});
+  }
+  function addBirds(freq,interval){
+    let alive=true;
+    function chirp(){
+      if(!alive||!ctx)return;
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      o.frequency.value=freq+Math.random()*800;o.type='sine';
+      const t=ctx.currentTime;
+      g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(0.13,t+0.03);
+      g.gain.linearRampToValueAtTime(0,t+0.2);
+      o.connect(g);g.connect(natureGain);o.start(t);
+      try{o.stop(t+0.25);}catch(e){}
+      const tid=setTimeout(chirp,interval+Math.random()*interval*1.5);
+      stops.push(()=>{clearTimeout(tid);try{o.stop();}catch(e){}g.disconnect();});
+    }
+    const tid=setTimeout(chirp,600+Math.random()*2000);
+    stops.push(()=>{alive=false;clearTimeout(tid);});
+  }
+  function addStream(){
+    const sr=ctx.sampleRate,len=sr*4,buf=ctx.createBuffer(1,len,sr),d=buf.getChannelData(0);
+    let last=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.2;}
+    const src=ctx.createBufferSource();src.buffer=buf;src.loop=true;
+    const bpf=ctx.createBiquadFilter();bpf.type='bandpass';bpf.frequency.value=350;bpf.Q.value=0.9;
+    const lfo=ctx.createOscillator();lfo.frequency.value=0.25;
+    const lfoG=ctx.createGain();lfoG.gain.value=120;
+    lfo.connect(lfoG);lfoG.connect(bpf.frequency);
+    src.connect(bpf);bpf.connect(natureGain);src.start();lfo.start();
+    stops.push(()=>{try{src.stop();}catch(e){}try{lfo.stop();}catch(e){}bpf.disconnect();lfoG.disconnect();});
+  }
+  if(id==='rain-birds'){addRain(550);addBirds(2200,3500);}
+  else if(id==='rain') {addRain(420);}
+  else if(id==='stream'){addStream();}
+  else if(id==='birds') {addBirds(2400,1800);}
+  return {stop:()=>stops.forEach(f=>{try{f();}catch(e){}})};
 }
 function switchNature(id,feedback=true){
-  Object.values(natureEls).forEach(el=>{if(!el.paused){el.pause();el.currentTime=0;}});
   activeNature=id;
+  if(natureSynth){try{natureSynth.stop();}catch(e){}natureSynth=null;}
+  document.querySelectorAll('[data-nature]').forEach(b=>b.classList.remove('loading'));
   if(!id||id==='none'){if(feedback)showToast('自然层已静音');return;}
   if(!ctx)return;
-  const el=getNatureEl(id);if(!el)return;
-  if(!el._wn){const s=ctx.createMediaElementSource(el);s.connect(natureGain);el._wn=true;}
-  const btn=document.querySelector(`[data-nature="${id}"]`);
-  if(btn)btn.classList.add('loading');
-  const onReady=()=>{if(btn)btn.classList.remove('loading');if(feedback)playChime();};
-  if(el.readyState>=2)onReady();
-  else el.addEventListener('canplay',onReady,{once:true});
-  el.play().catch(e=>{if(btn)btn.classList.remove('loading');console.warn('nature',e);});
-  if(feedback)showToast(`↪ ${NATURE_NAMES[id]||id}`);
+  natureSynth=makeNatureSynth(id);
+  if(feedback){playChime();showToast(`↪ ${NATURE_NAMES[id]||id}`);}
 }
 
 // 单色音合成
@@ -743,7 +773,7 @@ async function startAll(){
 }
 async function stopAll(){
   stopKS();if(instrSrc)try{instrSrc.stop();}catch(e){}instrSrc=null;instrSrcGain=null;
-  Object.values(natureEls).forEach(el=>{if(!el.paused)el.pause();});
+  if(natureSynth){try{natureSynth.stop();}catch(e){}natureSynth=null;}
   if(ctx)await ctx.suspend();
   playing=false;updUI();recordSleep();
 }

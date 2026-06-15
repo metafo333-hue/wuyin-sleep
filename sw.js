@@ -1,5 +1,5 @@
 // 五音 · service worker · 离线缓存（Web Audio 实时合成，无音频文件，纯壳离线即可全功能）
-const CACHE = 'wuyin-v4.1';
+const CACHE = 'wuyin-v4.2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
